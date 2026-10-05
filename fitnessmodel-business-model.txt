@@ -1,0 +1,34 @@
+﻿Business Model Canvas - Personal Trainer MVP
+1. Value Propositions
+For Personal Trainers:
+* Free Digital Footprint: Get a professional landing page optimized for local Google search without paying web hosting costs.
+* Zero Commission: Keep 100% of client payments with no lead fees.
+* Social Media Traffic: Drive motivated clients directly to their Instagram or TikTok feeds where their best content already lives.
+For Clients:
+* Frictionless Discovery: Search local trainers by city, modality (home, gym, outdoor, online), and rates without creating an account.
+* Social Proof First: Preview a trainer's active social feed before reaching out to verify their style and real client results.
+2. Customer Segments
+* Supply Side (Trainers): Freelance personal trainers, athletic coaches, and online fitness trainers looking for extra client visibility.
+* Demand Side (Clients): People wanting structured workout routines, weight loss guidance, injury recovery, or accountability in their local area.
+3. Channels
+* Trainer Acquisition: Direct DM outreach on Instagram, partnerships with fitness academies/universities, and referral links shared by early adopters.
+* Client Acquisition: Local Google SEO targeting terms like "Personal trainer in [City Name]" and social shares from listed trainers.
+4. Customer Relationships
+* Self-Service & Automated: Fast, 3-step signup requiring zero manual assistance.
+* Value Demonstration: Automated monthly emails sent to trainers reporting profile views and outbound social media clicks.
+5. Revenue Streams
+* MVP Phase ($0): Free listing model to rapidly cross the 100+ trainer milestone and trigger network effects.
+* Phase 2 Gate (Future Upsell): Pro Tier Subscription ($10 - $20/month) unlocking direct WhatsApp & Call buttons, featured top-of-search placement, and a "Verified Trainer" trust badge.
+6. Key Resources
+* Tech Stack: High-speed directory built on React.js, Supabase, typescript and tailwindcss 4.
+* Data Asset: A clean, searchable database of active, responsive local trainers.
+7. Key Activities
+* Supply Growth: Aggressive outreach to hit 100+ trainers in target cities.
+* SEO Engineering: Generating dynamic programmatically-created city pages (e.g., /trainers/madrid, /trainers/miami).
+* Moderation: Filtering out inactive or spam profiles to maintain directory quality.
+8. Key Partners
+* Fitness Academies: Certification schools looking to offer job placement or marketing tools to newly certified trainers.
+* Geocoding APIs: Mapbox or Google Maps for location autocomplete and distance calculations.
+9. Cost Structure
+* Infrastructure: Minimal cloud costs (Vercel, Supabase PostgreSQL).
+* Outreach: Founder time and direct social messaging.
