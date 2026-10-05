@@ -244,13 +244,16 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-[auth.email.template.magic_link]
-subject = "Your FitnessMode sign-in link"
-content_path = "./supabase/templates/magic_link.html"
+# NOTE: free-tier hosted projects reject custom email templates unless a custom
+# SMTP provider is configured, so these are commented out for `supabase config push`.
+# Uncomment when running the local stack (templates are loaded from supabase/templates/).
+# [auth.email.template.magic_link]
+# subject = "Your FitnessMode sign-in link"
+# content_path = "./supabase/templates/magic_link.html"
 
-[auth.email.template.confirmation]
-subject = "Confirm your FitnessMode trainer listing"
-content_path = "./supabase/templates/confirmation.html"
+# [auth.email.template.confirmation]
+# subject = "Confirm your FitnessMode trainer listing"
+# content_path = "./supabase/templates/confirmation.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
