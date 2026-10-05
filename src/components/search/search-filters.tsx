@@ -3,7 +3,10 @@ import type { SearchFilters as Filters } from "@/lib/validation/search";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/form";
 
-/** Plain GET form: filters live in URL params, so it works without JS and is shareable. */
+/**
+ * Plain GET form: filters live in URL params, so it works without JS and is shareable.
+ * Keyed on the filters so uncontrolled fields reset on client navigation (e.g. Reset).
+ */
 export function SearchFilters({
   filters,
   cities,
@@ -14,7 +17,12 @@ export function SearchFilters({
   taxonomy: Taxonomy;
 }) {
   return (
-    <form action="/search" method="get" className="flex flex-col gap-4">
+    <form
+      key={JSON.stringify(filters)}
+      action="/search"
+      method="get"
+      className="flex flex-col gap-4"
+    >
       <Field label="Keyword" htmlFor="filter-q">
         <Input id="filter-q" name="q" defaultValue={filters.q} placeholder="e.g. boxing, yoga" />
       </Field>
