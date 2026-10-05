@@ -3,12 +3,22 @@ import { NextResponse, type NextRequest } from "next/server";
 import { finalizePendingProfile } from "@/lib/db/profile-mutations";
 import { createClient } from "@/lib/supabase/server";
 
+/** Origin the browser actually used, so session cookies and the redirect share a host. */
+function requestOrigin(request: NextRequest) {
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!host) return request.nextUrl.origin;
+  const proto =
+    request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(/:$/, "");
+  return `${proto}://${host}`;
+}
+
 /**
  * Magic-link landing. Supports both the token_hash email template (works across devices)
  * and the PKCE `code` flow.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl;
+  const { searchParams } = request.nextUrl;
+  const origin = requestOrigin(request);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
