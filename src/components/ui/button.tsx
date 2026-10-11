@@ -2,13 +2,14 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary: "bg-brand text-brand-foreground hover:bg-brand-strong",
   secondary: "border border-border bg-surface text-text hover:bg-surface-muted",
   ghost: "text-text-muted hover:bg-surface-muted hover:text-text",
+  danger: "bg-danger text-white hover:bg-danger/90",
 };
 
 const sizes: Record<Size, string> = {

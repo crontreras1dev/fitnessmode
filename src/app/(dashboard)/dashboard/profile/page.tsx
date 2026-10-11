@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTaxonomy } from "@/lib/db/queries";
 import type { ProfileFormInput } from "@/lib/validation/profile";
+import DeleteProfileForm from "@/components/signup/delete-profile-form";
 import { ProfileEditForm } from "@/components/signup/profile-edit-form";
 import { requireOwnProfile } from "../data";
 
@@ -40,6 +41,7 @@ export default async function DashboardProfilePage() {
         defaultValues={defaultValues}
         initialCity={profile.city}
       />
+      <DeleteProfileForm />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getOwnProfile, updateProfile } from "@/lib/db/profile-mutations";
 import { profilePath } from "@/lib/seo/site";
 import { createClient } from "@/lib/supabase/server";
@@ -32,4 +33,27 @@ export async function saveProfile(
     revalidatePath(`/trainers/${profile.city.slug}`);
   }
   return { ok: true };
+}
+
+export async function deleteProfile(confirmation: string): Promise<{ ok: false; error: string }> {
+  if (confirmation !== "DELETE") {
+    return { ok: false, error: "Type DELETE to confirm profile deletion." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Your session expired. Please log in again." };
+
+  const profile = await getOwnProfile(supabase, user.id);
+  if (!profile) return { ok: false, error: "Your profile could not be found." };
+
+  const { error } = await supabase.from("profiles").delete().eq("id", user.id);
+  if (error) return { ok: false, error: "We couldn't delete your profile. Please try again." };
+
+  revalidatePath(profilePath(profile.city.slug, profile.slug));
+  revalidatePath(`/trainers/${profile.city.slug}`);
+  await supabase.auth.signOut();
+  redirect("/");
 }
