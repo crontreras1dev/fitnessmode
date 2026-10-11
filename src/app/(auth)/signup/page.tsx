@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTaxonomy } from "@/lib/db/queries";
 import { createClient } from "@/lib/supabase/server";
+import { AuthDivider, GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { SignupWizard } from "@/components/signup/signup-wizard";
 
 export const dynamic = "force-dynamic";
@@ -12,8 +13,10 @@ export const metadata: Metadata = {
     "Create a free personal trainer profile in 3 steps. Get found on local Google search and send clients to your Instagram or TikTok.",
 };
 
-export default async function SignupPage() {
-  const supabase = await createClient();
+type Props = { searchParams: Promise<{ error?: string }> };
+
+export default async function SignupPage({ searchParams }: Props) {
+  const [{ error }, supabase] = await Promise.all([searchParams, createClient()]);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -35,6 +38,17 @@ export default async function SignupPage() {
           Three quick steps. No fees, no commission — clients reach you directly.
         </p>
       </header>
+      {error === "oauth" ? (
+        <p role="alert" className="bg-pro-soft text-danger rounded-xl px-4 py-3 text-sm">
+          We couldn&apos;t continue with Google. Please try again.
+        </p>
+      ) : null}
+      {!user ? (
+        <>
+          <GoogleAuthButton next="/signup" failurePath="/signup" />
+          <AuthDivider />
+        </>
+      ) : null}
       <SignupWizard taxonomy={taxonomy} requireEmail={!user} />
     </div>
   );

@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
+  const source = searchParams.get("source");
   const nextParam = searchParams.get("next") ?? "/dashboard";
   const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard";
 
@@ -34,7 +35,11 @@ export async function GET(request: NextRequest) {
   } else {
     error = new Error("Missing token");
   }
-  if (error) return NextResponse.redirect(new URL("/login?error=link", origin));
+  if (error) {
+    const errorType = source === "google" ? "oauth" : "link";
+    const errorPath = next === "/signup" ? "/signup?error=oauth" : `/login?error=${errorType}`;
+    return NextResponse.redirect(new URL(errorPath, origin));
+  }
 
   try {
     const result = await finalizePendingProfile(supabase);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AuthDivider, GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Trainer log in", robots: { index: false } };
@@ -13,15 +14,19 @@ export default async function LoginPage({ searchParams }: Props) {
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">Trainer log in</h1>
         <p className="text-text-muted mt-2">
-          We&apos;ll email you a magic link — no password needed. Clients don&apos;t need an
-          account.
+          Continue with Google or request a magic link — no password needed. Clients don&apos;t need
+          an account.
         </p>
       </header>
       {error ? (
         <p role="alert" className="bg-pro-soft text-danger rounded-xl px-4 py-3 text-sm">
-          That sign-in link is invalid or has expired. Request a new one below.
+          {error === "oauth"
+            ? "We couldn't sign you in with Google. Please try again."
+            : "That sign-in link is invalid or has expired. Request a new one below."}
         </p>
       ) : null}
+      <GoogleAuthButton next={next ?? "/dashboard"} failurePath="/login" />
+      <AuthDivider />
       <LoginForm next={next} />
       <p className="text-text-muted text-sm">
         Not listed yet?{" "}
