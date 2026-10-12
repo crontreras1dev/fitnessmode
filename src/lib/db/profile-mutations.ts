@@ -102,7 +102,7 @@ export async function getOwnProfile(client: Client, userId: string) {
   const { data } = await client
     .from("profiles")
     .select(
-      "id, slug, display_name, headline, bio, city_id, instagram_url, tiktok_url, website_url, rate_min, rate_max, currency, tier, status, city:cities!inner(id, slug, name, region, country_code, is_published), profile_categories(category_id), profile_modalities(modality_id), profile_specialties(specialty_id)",
+      "id, slug, display_name, headline, bio, city_id, avatar_url, instagram_url, tiktok_url, website_url, rate_min, rate_max, currency, tier, status, city:cities!inner(id, slug, name, region, country_code, is_published), profile_categories(category_id), profile_modalities(modality_id), profile_specialties(specialty_id)",
     )
     .eq("id", userId)
     .maybeSingle();

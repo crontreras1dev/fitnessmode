@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTaxonomy } from "@/lib/db/queries";
 import type { ProfileFormInput } from "@/lib/validation/profile";
+import { AvatarUpload } from "@/components/signup/avatar-upload";
 import DeleteProfileForm from "@/components/signup/delete-profile-form";
 import { ProfileEditForm } from "@/components/signup/profile-edit-form";
 import { requireOwnProfile } from "../data";
@@ -36,6 +37,7 @@ export default async function DashboardProfilePage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold tracking-tight">Edit profile</h1>
+      <AvatarUpload name={profile.display_name} avatarUrl={profile.avatar_url} />
       <ProfileEditForm
         taxonomy={taxonomy}
         defaultValues={defaultValues}
