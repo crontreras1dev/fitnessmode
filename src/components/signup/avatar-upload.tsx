@@ -100,9 +100,7 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
         <TrainerAvatar name={name} avatarUrl={previewUrl ?? currentUrl} size="lg" />
         <div className="flex flex-1 flex-col gap-3">
           <div>
-            <label htmlFor="avatar" className="text-sm font-medium">
-              Choose a photo
-            </label>
+            <label className="text-sm font-medium">Choose a photo</label>
             <input
               ref={inputRef}
               id="avatar"
@@ -110,8 +108,21 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
               accept={AVATAR_TYPES.join(",")}
               disabled={pending}
               onChange={(event) => selectFile(event.target.files?.[0])}
-              className="border-border bg-surface text-text file:bg-surface-muted file:text-text mt-1.5 block w-full rounded-xl border text-sm file:mr-3 file:border-0 file:px-3.5 file:py-2.5 file:font-medium"
+              className="sr-only"
             />
+            <div className="mt-1.5 flex items-center gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => inputRef.current?.click()}
+                disabled={pending}
+              >
+                Select file
+              </Button>
+              <span className="text-text-muted truncate text-sm" aria-live="polite">
+                {file ? file.name : "No file selected"}
+              </span>
+            </div>
             <p className="text-text-muted mt-1.5 text-xs">JPEG, PNG, or WebP. Maximum 5 MB.</p>
           </div>
           <div className="flex flex-wrap gap-2">
