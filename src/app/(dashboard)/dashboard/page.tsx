@@ -32,7 +32,16 @@ export default async function DashboardPage({ searchParams }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold tracking-tight">Hi, {profile.display_name}</h1>
         <div className="flex gap-2">
-          <Badge tone={profile.status === "active" ? "brand" : "neutral"} className="capitalize">
+          <Badge
+            tone={
+              profile.status === "active"
+                ? "brand"
+                : profile.status === "suspended"
+                  ? "danger"
+                  : "amber"
+            }
+            className="capitalize"
+          >
             {profile.status}
           </Badge>
           <Badge tone={profile.tier === "pro" ? "pro" : "neutral"} className="uppercase">

@@ -1,12 +1,14 @@
 import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
-type Tone = "neutral" | "brand" | "pro";
+type Tone = "neutral" | "brand" | "pro" | "amber" | "danger";
 
 const tones: Record<Tone, string> = {
   neutral: "bg-surface-muted text-text-muted",
   brand: "bg-brand-soft text-brand-strong",
   pro: "bg-pro-soft text-pro",
+  amber: "bg-amber-soft text-amber",
+  danger: "bg-danger-soft text-danger",
 };
 
 export function Badge({
