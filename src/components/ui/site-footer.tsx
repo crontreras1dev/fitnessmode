@@ -12,7 +12,7 @@ export function SiteFooter() {
           <Link href="/search" className="hover:text-text">
             Find a trainer
           </Link>
-          <Link href="/signup" className="hover:text-text">
+          <Link href="/for-trainers" className="hover:text-text">
             For trainers
           </Link>
         </nav>
