@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import type { Trainer } from "@/lib/db/queries";
-import { formatRate } from "@/lib/format";
-import { profilePath } from "@/lib/seo/site";
-import { Badge } from "@/components/ui/badge";
+import { absoluteUrl, profilePath } from "@/lib/seo/site";
+import { ButtonLink } from "@/components/ui/button";
+import { FavoriteButton } from "./favorite-button";
+import { ShareButton } from "./share-button";
 import { TrainerAvatar } from "./trainer-avatar";
 
 export function TrainerCard({
@@ -12,39 +15,50 @@ export function TrainerCard({
   trainer: Trainer;
   showCity?: boolean;
 }) {
-  const rate = formatRate(trainer.rateMin, trainer.rateMax, trainer.currency);
+  const url = absoluteUrl(profilePath(trainer.city.slug, trainer.slug));
+
   return (
-    <article className="group rounded-card border-border bg-surface relative flex flex-col gap-4 border p-5 transition-shadow hover:shadow-md">
-      <div className="flex items-start gap-4">
-        <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate text-base font-semibold">
-              <Link
-                href={profilePath(trainer.city.slug, trainer.slug)}
-                className="after:rounded-card after:absolute after:inset-0"
-              >
-                {trainer.displayName}
-              </Link>
-            </h3>
-            {trainer.tier === "pro" ? <Badge tone="pro">Verified</Badge> : null}
-          </div>
-          <p className="text-text-muted mt-0.5 text-sm">
-            {trainer.categories.map((category) => category.name).join(" · ") || "Trainer"}
-            {showCity ? ` · ${trainer.city.name}` : null}
-          </p>
-        </div>
+    <article className="group rounded-card border-border bg-surface flex h-full flex-col items-center gap-4 border p-5 text-center transition-shadow hover:shadow-md">
+      <Link href={profilePath(trainer.city.slug, trainer.slug)}>
+        <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} size="xl" />
+      </Link>
+
+      <div className="flex flex-col gap-1">
+        <h3 className="text-lg font-semibold">
+          <Link
+            href={profilePath(trainer.city.slug, trainer.slug)}
+            className="hover:text-brand-strong transition-colors"
+          >
+            {trainer.displayName}
+          </Link>
+        </h3>
+        <p className="text-text-muted text-sm">
+          {showCity ? trainer.city.name : `Trainer in ${trainer.city.name}`}
+        </p>
       </div>
-      {trainer.headline || trainer.bio ? (
-        <p className="text-text-muted line-clamp-2 text-sm">{trainer.headline || trainer.bio}</p>
-      ) : null}
-      <div className="mt-auto flex flex-wrap items-center gap-1.5">
-        {trainer.modalities.map((modality) => (
-          <Badge key={modality.slug} tone="brand">
-            {modality.name}
-          </Badge>
-        ))}
-        {rate ? <span className="ml-auto text-sm font-medium">{rate}</span> : null}
+
+      <p className="text-text-muted min-h-[1.25rem] text-sm">
+        {trainer.modalities.length
+          ? trainer.modalities.map((modality) => modality.name).join(" · ")
+          : "\u00A0"}
+      </p>
+
+      <p className="text-text-muted line-clamp-3 min-h-[3.75rem] text-sm">
+        {trainer.headline || trainer.bio ? trainer.headline || trainer.bio : "\u00A0"}
+      </p>
+
+      <div className="mt-auto flex w-full items-center justify-between gap-2 pt-2">
+        <div className="flex items-center gap-1">
+          <ShareButton url={url} title={trainer.displayName} />
+          <FavoriteButton slug={trainer.slug} />
+        </div>
+        <ButtonLink
+          href={profilePath(trainer.city.slug, trainer.slug)}
+          variant="secondary"
+          size="sm"
+        >
+          See Profile
+        </ButtonLink>
       </div>
     </article>
   );

@@ -8,9 +8,10 @@ export function TrainerAvatar({
 }: {
   name: string;
   avatarUrl?: string | null;
-  size?: "md" | "lg";
+  size?: "md" | "lg" | "xl";
 }) {
-  const sizeClasses = size === "lg" ? "size-24 text-2xl" : "size-14 text-lg";
+  const sizeClasses =
+    size === "xl" ? "size-32 text-3xl" : size === "lg" ? "size-24 text-2xl" : "size-14 text-lg";
   if (avatarUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- arbitrary trainer-provided hosts

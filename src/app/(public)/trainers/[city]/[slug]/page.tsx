@@ -4,10 +4,12 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getTrainerBySlug, getTrainerContact, type Trainer } from "@/lib/db/queries";
 import { formatRate } from "@/lib/format";
 import { breadcrumbJsonLd, trainerPersonJsonLd } from "@/lib/seo/jsonld";
-import { cityPath, profilePath } from "@/lib/seo/site";
+import { absoluteUrl, cityPath, profilePath } from "@/lib/seo/site";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { JsonLd } from "@/components/seo/json-ld";
+import { FavoriteButton } from "@/components/trainers/favorite-button";
+import { ShareButton } from "@/components/trainers/share-button";
 import { TrackView } from "@/components/trainers/track-view";
 import { TrainerAvatar } from "@/components/trainers/trainer-avatar";
 import { TrainerCtaButtons, type TrainerCta } from "@/components/trainers/trainer-cta-buttons";
@@ -96,17 +98,30 @@ export default async function TrainerProfilePage({ params }: Props) {
         / <span className="text-text">{trainer.displayName}</span>
       </nav>
 
-      <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center">
-        <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} size="lg" />
+      <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
+        <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} size="xl" />
         <div className="flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight">{trainer.displayName}</h1>
-            {trainer.tier === "pro" ? <Badge tone="pro">Verified trainer</Badge> : null}
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-3xl font-semibold tracking-tight">{trainer.displayName}</h1>
+                {trainer.tier === "pro" ? <Badge tone="pro">Verified trainer</Badge> : null}
+              </div>
+              <p className="text-text-muted mt-1">
+                {trainer.categories.map((category) => category.name).join(" · ")} in{" "}
+                {trainer.city.name}
+              </p>
+              {trainer.headline ? <p className="mt-2 text-lg">{trainer.headline}</p> : null}
+            </div>
+            <div className="flex items-center gap-1">
+              <FavoriteButton slug={trainer.slug} className="shrink-0" />
+              <ShareButton
+                url={absoluteUrl(profilePath(trainer.city.slug, trainer.slug))}
+                title={trainer.displayName}
+                className="shrink-0"
+              />
+            </div>
           </div>
-          <p className="text-text-muted mt-1">
-            {trainer.categories.map((category) => category.name).join(" · ")} in {trainer.city.name}
-          </p>
-          {trainer.headline ? <p className="mt-2 text-lg">{trainer.headline}</p> : null}
         </div>
       </header>
 
