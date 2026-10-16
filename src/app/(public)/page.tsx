@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { getCities, getTaxonomy } from "@/lib/db/queries";
+import { getCities, getFeaturedTrainers, getTaxonomy } from "@/lib/db/queries";
+import { MOCK_TRAINERS } from "@/lib/mock/trainers";
 import { cityPath } from "@/lib/seo/site";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { HeroSearch } from "@/components/search/hero-search";
+import { TrainerCarousel } from "@/components/trainers/trainer-carousel";
 
 export const revalidate = 3600;
 
@@ -23,7 +25,15 @@ const STEPS = [
 ];
 
 export default async function HomePage() {
-  const [taxonomy, cities] = await Promise.all([getTaxonomy(), getCities({ publishedOnly: true })]);
+  const [taxonomy, cities, featuredTrainers] = await Promise.all([
+    getTaxonomy(),
+    getCities({ publishedOnly: true }),
+    getFeaturedTrainers(24),
+  ]);
+  const featuredPool =
+    process.env.NODE_ENV === "development"
+      ? [...featuredTrainers, ...MOCK_TRAINERS]
+      : featuredTrainers;
 
   return (
     <>
@@ -39,6 +49,18 @@ export default async function HomePage() {
           <HeroSearch modalities={taxonomy.modalities} />
         </div>
       </section>
+
+      {featuredPool.length ? (
+        <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
+          <h2 className="text-2xl font-semibold tracking-tight">Featured trainers</h2>
+          <p className="text-text-muted mt-2">
+            See someone you like? Open their profile and message them today.
+          </p>
+          <div className="mt-6">
+            <TrainerCarousel pool={featuredPool} count={5} />
+          </div>
+        </section>
+      ) : null}
 
       {cities.length ? (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">

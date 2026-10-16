@@ -98,6 +98,16 @@ export async function getTrainersByCity(cityId: number, limit = 100) {
   return (data ?? []).map(mapTrainer);
 }
 
+export async function getFeaturedTrainers(limit = 24) {
+  const client = createPublicClient();
+  if (!client) return [];
+  const { data } = await trainerQuery(client)
+    .order("tier", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map(mapTrainer);
+}
+
 export const getTrainerBySlug = cache(async (slug: string) => {
   const client = createPublicClient();
   if (!client) return null;
