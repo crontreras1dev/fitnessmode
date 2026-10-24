@@ -84,6 +84,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      pending_signups: {
+        Row: {
+          created_at: string;
+          email: string;
+          profile: Json;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          profile: Json;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          profile?: Json;
+        };
+        Relationships: [];
+      };
       profile_categories: {
         Row: {
           category_id: number;
@@ -213,9 +231,10 @@ export type Database = {
         Row: {
           avatar_url: string | null;
           bio: string | null;
-          city_id: number;
+          city_id: number | null;
           created_at: string;
           currency: string;
+          custom_location: string | null;
           display_name: string;
           headline: string | null;
           id: string;
@@ -235,9 +254,10 @@ export type Database = {
         Insert: {
           avatar_url?: string | null;
           bio?: string | null;
-          city_id: number;
+          city_id?: number | null;
           created_at?: string;
           currency?: string;
+          custom_location?: string | null;
           display_name: string;
           headline?: string | null;
           id: string;
@@ -257,9 +277,10 @@ export type Database = {
         Update: {
           avatar_url?: string | null;
           bio?: string | null;
-          city_id?: number;
+          city_id?: number | null;
           created_at?: string;
           currency?: string;
+          custom_location?: string | null;
           display_name?: string;
           headline?: string | null;
           id?: string;

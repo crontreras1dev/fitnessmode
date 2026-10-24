@@ -43,10 +43,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await finalizePendingProfile(supabase);
-    if (result === "missing") return NextResponse.redirect(new URL("/signup", origin));
+    if (result === "missing") {
+      console.error("auth callback: no pending profile found for verified user");
+      return NextResponse.redirect(new URL("/signup?error=profile", origin));
+    }
     if (result === "created") return NextResponse.redirect(new URL("/dashboard?welcome=1", origin));
-  } catch {
-    return NextResponse.redirect(new URL("/signup", origin));
+  } catch (e) {
+    console.error("auth callback: profile creation failed", e);
+    return NextResponse.redirect(new URL("/signup?error=profile", origin));
   }
   return NextResponse.redirect(new URL(next, origin));
 }

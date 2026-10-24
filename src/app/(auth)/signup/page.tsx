@@ -43,6 +43,12 @@ export default async function SignupPage({ searchParams }: Props) {
           We couldn&apos;t continue with Google. Please try again.
         </p>
       ) : null}
+      {error === "profile" ? (
+        <p role="alert" className="bg-pro-soft text-danger rounded-xl px-4 py-3 text-sm">
+          We couldn&apos;t restore your answers after email sign-in. Please fill the form once more
+          — you&apos;re now signed in, so your profile will be created on submit.
+        </p>
+      ) : null}
       {!user ? (
         <>
           <GoogleAuthButton next="/signup" failurePath="/signup" />
