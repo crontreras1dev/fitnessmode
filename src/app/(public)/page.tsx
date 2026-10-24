@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getCities, getFeaturedTrainers, getTaxonomy } from "@/lib/db/queries";
-import { MOCK_TRAINERS } from "@/lib/mock/trainers";
 import { cityPath } from "@/lib/seo/site";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,10 +29,6 @@ export default async function HomePage() {
     getCities({ publishedOnly: true }),
     getFeaturedTrainers(24),
   ]);
-  const featuredPool =
-    process.env.NODE_ENV === "development"
-      ? [...featuredTrainers, ...MOCK_TRAINERS]
-      : featuredTrainers;
 
   return (
     <>
@@ -50,14 +45,41 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {featuredPool.length ? (
+      <section className="mx-auto max-w-3xl px-4 pt-14 sm:px-6">
+        <h2 className="text-2xl font-semibold tracking-tight">What is FitnessMode?</h2>
+        <p className="text-text-muted mt-4">
+          Choosing a trainer from a Google search or an Instagram hashtag is a shot in the dark
+          — you can't easily compare specialties, rates, or locations side by side.
+        </p>
+        <p className="text-text-muted mt-3">
+          FitnessMode puts local trainers, coaches, and online professionals in one place. Browse
+          by city and modality, preview each trainer's real work through their social feeds, and
+          message them directly when you're ready.
+        </p>
+        <ul className="mt-5 flex flex-wrap gap-2">
+          {[
+            "Free to browse — no account needed",
+            "See real client results on their social feeds",
+            "Contact trainers directly — no markups on your sessions",
+          ].map((badge) => (
+            <li
+              key={badge}
+              className="border-border bg-surface text-text-muted rounded-full border px-3 py-1 text-sm"
+            >
+              {badge}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {featuredTrainers.length ? (
         <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
           <h2 className="text-2xl font-semibold tracking-tight">Featured trainers</h2>
           <p className="text-text-muted mt-2">
             See someone you like? Open their profile and message them today.
           </p>
           <div className="mt-6">
-            <TrainerCarousel pool={featuredPool} count={5} />
+            <TrainerCarousel pool={featuredTrainers} count={5} />
           </div>
         </section>
       ) : null}
