@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getCities, getFeaturedTrainers, getTaxonomy } from "@/lib/db/queries";
 import { cityPath } from "@/lib/seo/site";
@@ -45,31 +46,42 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-4 pt-14 sm:px-6">
-        <h2 className="text-2xl font-semibold tracking-tight">What is FitnessMode?</h2>
-        <p className="text-text-muted mt-4">
-          Choosing a trainer from a Google search or an Instagram hashtag is a shot in the dark
-          — you can't easily compare specialties, rates, or locations side by side.
-        </p>
-        <p className="text-text-muted mt-3">
-          FitnessMode puts local trainers, coaches, and online professionals in one place. Browse
-          by city and modality, preview each trainer's real work through their social feeds, and
-          message them directly when you're ready.
-        </p>
-        <ul className="mt-5 flex flex-wrap gap-2">
-          {[
-            "Free to browse — no account needed",
-            "See real client results on their social feeds",
-            "Contact trainers directly — no markups on your sessions",
-          ].map((badge) => (
-            <li
-              key={badge}
-              className="border-border bg-surface text-text-muted rounded-full border px-3 py-1 text-sm"
-            >
-              {badge}
-            </li>
-          ))}
-        </ul>
+      <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
+        <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-12">
+          <div className="flex-1">
+            <h2 className="text-2xl font-semibold tracking-tight">What is FitnessMode?</h2>
+            <p className="text-text-muted mt-4">
+              Choosing a trainer from a Google search or an Instagram hashtag is a shot in the
+              dark — you can't easily compare specialties, rates, or locations side by side.
+            </p>
+            <p className="text-text-muted mt-3">
+              FitnessMode puts local trainers, coaches, and online professionals in one place.
+              Browse by city and modality, preview each trainer's real work through their social
+              feeds, and message them directly when you're ready.
+            </p>
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {[
+                "Free to browse — no account needed",
+                "See real client results on their social feeds",
+                "Contact trainers directly — no markups on your sessions",
+              ].map((badge) => (
+                <li
+                  key={badge}
+                  className="border-border bg-surface text-text-muted rounded-full border px-3 py-1 text-sm"
+                >
+                  {badge}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Image
+            src="/images/what-is-fitnessmode.png"
+            alt="A person browsing trainer profile cards with location pins and social media icons"
+            width={1408}
+            height={768}
+            className="mx-auto w-full max-w-md md:w-5/12"
+          />
+        </div>
       </section>
 
       {featuredTrainers.length ? (
