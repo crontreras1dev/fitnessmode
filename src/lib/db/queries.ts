@@ -17,7 +17,7 @@ export type ProfileTier = Database["public"]["Enums"]["profile_tier"];
 const CITY_COLUMNS = "id, slug, name, region, country_code, latitude, longitude, is_published";
 
 const TRAINER_SELECT =
-  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, city:cities!inner(slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name))";
+  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, custom_location, city:cities(slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name))";
 
 export const PAGE_SIZE = 24;
 
@@ -42,6 +42,7 @@ function mapTrainer(row: TrainerRow) {
     websiteUrl: row.website_url,
     updatedAt: row.updated_at,
     city: row.city,
+    customLocation: row.custom_location,
     categories: row.profile_categories.map((item) => item.categories).filter(notNull),
     modalities: row.profile_modalities.map((item) => item.modalities).filter(notNull),
     specialties: row.profile_specialties.map((item) => item.specialties).filter(notNull),
@@ -157,7 +158,7 @@ export async function getSitemapEntries() {
     client.from("cities").select("slug, created_at").eq("is_published", true),
     client
       .from("profiles")
-      .select("slug, updated_at, city:cities!inner(slug)")
+      .select("slug, updated_at, city:cities(slug)")
       .eq("status", "active")
       .limit(50000),
   ]);

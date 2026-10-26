@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { profilePath } from "@/lib/seo/site";
+import { trainerProfilePath } from "@/lib/seo/site";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,7 +20,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   const { welcome } = await searchParams;
   const { profile } = await requireOwnProfile();
   const stats = await getStats(30);
-  const publicPath = profilePath(profile.city.slug, profile.slug);
+  const publicPath = trainerProfilePath(profile);
 
   return (
     <div className="flex flex-col gap-6">

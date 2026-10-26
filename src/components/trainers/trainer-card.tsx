@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Trainer } from "@/lib/db/queries";
-import { absoluteUrl, profilePath } from "@/lib/seo/site";
+import { absoluteUrl, trainerLocationName, trainerProfilePath } from "@/lib/seo/site";
 import { ButtonLink } from "@/components/ui/button";
 import { FavoriteButton } from "./favorite-button";
 import { ShareButton } from "./share-button";
@@ -15,26 +15,23 @@ export function TrainerCard({
   trainer: Trainer;
   showCity?: boolean;
 }) {
-  const url = absoluteUrl(profilePath(trainer.city.slug, trainer.slug));
+  const path = trainerProfilePath(trainer);
+  const location = trainerLocationName(trainer);
+  const url = absoluteUrl(path);
 
   return (
     <article className="group rounded-card border-border bg-surface flex h-full flex-col items-center gap-4 border p-5 text-center transition-shadow hover:shadow-md">
-      <Link href={profilePath(trainer.city.slug, trainer.slug)}>
+      <Link href={path}>
         <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} size="xl" />
       </Link>
 
       <div className="flex flex-col gap-1">
         <h3 className="text-lg font-semibold">
-          <Link
-            href={profilePath(trainer.city.slug, trainer.slug)}
-            className="hover:text-brand-strong transition-colors"
-          >
+          <Link href={path} className="hover:text-brand-strong transition-colors">
             {trainer.displayName}
           </Link>
         </h3>
-        <p className="text-text-muted text-sm">
-          {showCity ? trainer.city.name : `Trainer in ${trainer.city.name}`}
-        </p>
+        <p className="text-text-muted text-sm">{showCity ? location : `Trainer in ${location}`}</p>
       </div>
 
       <p className="text-text-muted min-h-[1.25rem] text-sm">
@@ -52,11 +49,7 @@ export function TrainerCard({
           <ShareButton url={url} title={trainer.displayName} />
           <FavoriteButton slug={trainer.slug} />
         </div>
-        <ButtonLink
-          href={profilePath(trainer.city.slug, trainer.slug)}
-          variant="secondary"
-          size="sm"
-        >
+        <ButtonLink href={path} variant="secondary" size="sm">
           See Profile
         </ButtonLink>
       </div>

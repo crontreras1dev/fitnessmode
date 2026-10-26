@@ -18,7 +18,8 @@ export default async function DashboardProfilePage() {
 
   const defaultValues: ProfileFormInput = {
     displayName: profile.display_name,
-    cityId: profile.city_id,
+    cityId: profile.city_id ?? 0,
+    customLocation: profile.custom_location ?? "",
     headline: profile.headline ?? "",
     bio: profile.bio ?? "",
     categoryIds: profile.profile_categories.map((item) => String(item.category_id)),

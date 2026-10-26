@@ -84,7 +84,8 @@ const optionalPhone = z
 
 export const basicsShape = {
   displayName: z.string().trim().min(2, "Enter your name").max(80),
-  cityId: z.number({ error: "Choose your city" }).int().positive("Choose your city"),
+  cityId: z.number({ error: "Choose your city" }).int().nonnegative("Choose your city"),
+  customLocation: z.string().trim().max(120).optional().default(""),
   headline: z.string().trim().max(120).optional().default(""),
   bio: z
     .string()
@@ -114,6 +115,8 @@ export const linksShape = {
 };
 
 type RefineInput = {
+  cityId: number;
+  customLocation: string;
   rateMin: number | null;
   rateMax: number | null;
   instagramUrl: string | null;
@@ -122,6 +125,13 @@ type RefineInput = {
 };
 
 function refineProfile(data: RefineInput, ctx: z.RefinementCtx) {
+  if (data.cityId <= 0 && data.customLocation.length < 2) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["cityId"],
+      message: "Choose your city, or tap below to enter your town or area",
+    });
+  }
   if (data.rateMin !== null && data.rateMax !== null && data.rateMin > data.rateMax) {
     ctx.addIssue({ code: "custom", path: ["rateMax"], message: "Max rate must be ≥ min rate" });
   }
@@ -144,7 +154,10 @@ export type ProfileFormInput = z.input<typeof profileSchema>;
 export type ProfileFormValues = z.output<typeof profileSchema>;
 
 export const SIGNUP_STEPS = [
-  { title: "About you", fields: ["displayName", "cityId", "headline", "bio"] },
+  {
+    title: "About you",
+    fields: ["displayName", "cityId", "customLocation", "headline", "bio"],
+  },
   {
     title: "Your services",
     fields: ["categoryIds", "modalityIds", "specialtyIds", "rateMin", "rateMax", "currency"],
@@ -155,6 +168,7 @@ export const SIGNUP_STEPS = [
 export const emptyProfileInput: ProfileFormInput = {
   displayName: "",
   cityId: 0,
+  customLocation: "",
   headline: "",
   bio: "",
   categoryIds: [],

@@ -11,12 +11,10 @@ export function SearchFilters({
   filters,
   cities,
   taxonomy,
-  mock = false,
 }: {
   filters: Filters;
   cities: City[];
   taxonomy: Taxonomy;
-  mock?: boolean;
 }) {
   return (
     <form
@@ -25,7 +23,6 @@ export function SearchFilters({
       method="get"
       className="flex flex-col gap-4"
     >
-      {mock ? <input type="hidden" name="mock" value="true" /> : null}
       <Field label="Keyword" htmlFor="filter-q">
         <Input id="filter-q" name="q" defaultValue={filters.q} placeholder="e.g. boxing, yoga" />
       </Field>
@@ -97,7 +94,7 @@ export function SearchFilters({
         <Button type="submit" className="flex-1">
           Apply filters
         </Button>
-        <ButtonLink href={mock ? "/search?mock=true" : "/search"} variant="ghost">
+        <ButtonLink href="/search" variant="ghost">
           Reset
         </ButtonLink>
       </div>

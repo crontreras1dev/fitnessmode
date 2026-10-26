@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCities, getTaxonomy, PAGE_SIZE, searchTrainers } from "@/lib/db/queries";
-import { MOCK_CITIES, MOCK_TAXONOMY, searchMockTrainers } from "@/lib/mock/trainers";
 import { parseSearchParams, type SearchFilters as Filters } from "@/lib/validation/search";
 import { buttonClasses } from "@/components/ui/button";
 import { SearchFilters } from "@/components/search/search-filters";
@@ -15,9 +14,8 @@ export const metadata: Metadata = {
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-function pageHref(filters: Filters, page: number, mock: boolean) {
+function pageHref(filters: Filters, page: number) {
   const params = new URLSearchParams();
-  if (mock) params.set("mock", "true");
   for (const [key, value] of Object.entries({ ...filters, page })) {
     if (value !== undefined && value !== "" && !(key === "page" && value === 1)) {
       params.set(key, String(value));
@@ -29,10 +27,11 @@ function pageHref(filters: Filters, page: number, mock: boolean) {
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
   const filters = parseSearchParams(params);
-  const mock = process.env.NODE_ENV === "development" && params.mock !== "false";
-  const [{ trainers, total, page }, cities, taxonomy] = mock
-    ? [searchMockTrainers(filters), MOCK_CITIES, MOCK_TAXONOMY]
-    : await Promise.all([searchTrainers(filters), getCities(), getTaxonomy()]);
+  const [{ trainers, total, page }, cities, taxonomy] = await Promise.all([
+    searchTrainers(filters),
+    getCities(),
+    getTaxonomy(),
+  ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const cityName = cities.find((city) => city.slug === filters.city)?.name;
 
@@ -40,7 +39,7 @@ export default async function SearchPage({ searchParams }: Props) {
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[16rem_1fr]">
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <h2 className="sr-only">Filters</h2>
-        <SearchFilters filters={filters} cities={cities} taxonomy={taxonomy} mock={mock} />
+        <SearchFilters filters={filters} cities={cities} taxonomy={taxonomy} />
       </aside>
       <section aria-live="polite">
         <h1 className="text-2xl font-semibold tracking-tight">
@@ -62,7 +61,7 @@ export default async function SearchPage({ searchParams }: Props) {
           <nav aria-label="Pagination" className="mt-8 flex items-center justify-between">
             {page > 1 ? (
               <Link
-                href={pageHref(filters, page - 1, mock)}
+                href={pageHref(filters, page - 1)}
                 className={buttonClasses({ variant: "secondary" })}
               >
                 Previous
@@ -75,7 +74,7 @@ export default async function SearchPage({ searchParams }: Props) {
             </span>
             {page < totalPages ? (
               <Link
-                href={pageHref(filters, page + 1, mock)}
+                href={pageHref(filters, page + 1)}
                 className={buttonClasses({ variant: "secondary" })}
               >
                 Next

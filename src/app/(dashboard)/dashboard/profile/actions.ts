@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getOwnProfile, updateProfile } from "@/lib/db/profile-mutations";
-import { profilePath } from "@/lib/seo/site";
+import { getOwnProfile, updateProfile, type OwnProfile } from "@/lib/db/profile-mutations";
+import { trainerProfilePath } from "@/lib/seo/site";
 import { createClient } from "@/lib/supabase/server";
 import { profileSchema, type ProfileFormInput } from "@/lib/validation/profile";
+
+function revalidateProfilePages(profile: OwnProfile) {
+  revalidatePath(trainerProfilePath(profile));
+  if (profile.city) revalidatePath(`/trainers/${profile.city.slug}`);
+}
 
 export async function saveProfile(
   input: ProfileFormInput,
@@ -28,9 +33,7 @@ export async function saveProfile(
   const after = await getOwnProfile(supabase, user.id);
 
   for (const profile of [before, after]) {
-    if (!profile) continue;
-    revalidatePath(profilePath(profile.city.slug, profile.slug));
-    revalidatePath(`/trainers/${profile.city.slug}`);
+    if (profile) revalidateProfilePages(profile);
   }
   return { ok: true };
 }
@@ -60,8 +63,7 @@ export async function saveUploadedAvatar(version: number): Promise<AvatarResult>
     .eq("id", user.id);
   if (error) return { ok: false, error: "We couldn't save your photo. Please try again." };
 
-  revalidatePath(profilePath(profile.city.slug, profile.slug));
-  revalidatePath(`/trainers/${profile.city.slug}`);
+  revalidateProfilePages(profile);
   return { ok: true, avatarUrl };
 }
 
@@ -87,8 +89,7 @@ export async function removeAvatar(): Promise<AvatarResult> {
   const { error } = await supabase.from("profiles").update({ avatar_url: null }).eq("id", user.id);
   if (error) return { ok: false, error: "We couldn't remove your photo. Please try again." };
 
-  revalidatePath(profilePath(profile.city.slug, profile.slug));
-  revalidatePath(`/trainers/${profile.city.slug}`);
+  revalidateProfilePages(profile);
   return { ok: true, avatarUrl: null };
 }
 
@@ -118,8 +119,7 @@ export async function deleteProfile(confirmation: string): Promise<{ ok: false; 
   const { error } = await supabase.from("profiles").delete().eq("id", user.id);
   if (error) return { ok: false, error: "We couldn't delete your profile. Please try again." };
 
-  revalidatePath(profilePath(profile.city.slug, profile.slug));
-  revalidatePath(`/trainers/${profile.city.slug}`);
+  revalidateProfilePages(profile);
   await supabase.auth.signOut();
   redirect("/");
 }

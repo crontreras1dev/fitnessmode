@@ -20,7 +20,23 @@ export function TrainerCarousel({ pool, count = 5 }: { pool: Trainer[]; count?: 
     setTrainers(pickRandom(pool, count));
   }, [pool, count]);
 
-  const items = [...trainers, ...trainers];
+  // A marquee needs enough unique cards to fill the viewport twice without
+  // obvious repeats; below the threshold a static row looks better.
+  if (trainers.length < 4) {
+    return (
+      <ul className="flex flex-wrap justify-center gap-4">
+        {trainers.map((trainer) => (
+          <li key={trainer.id} className="w-72 sm:w-80">
+            <TrainerCard trainer={trainer} showCity />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  // Repeat the set enough times that half the track always covers the viewport.
+  const copies = Math.max(2, Math.ceil(8 / trainers.length));
+  const items = Array.from({ length: copies }, () => trainers).flat();
 
   return (
     <div className="overflow-hidden">
