@@ -133,25 +133,34 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="rounded-card bg-text text-bg flex flex-col items-center gap-6 p-8 text-center sm:items-start sm:p-10 sm:text-left lg:mx-auto lg:w-1/2">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Are you a trainer?</h2>
-            <p className="text-bg/70 mt-2 max-w-lg">
-              Get a free profile page that ranks on local Google search and sends clients straight
-              to your Instagram or TikTok. Keep 100% of what you earn.
-            </p>
+        <div className="rounded-card bg-text text-bg flex flex-col gap-8 p-8 text-center sm:p-10 md:flex-row md:items-center md:gap-12 md:text-left">
+          <div className="flex flex-1 flex-col items-center gap-6 md:items-start">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">Are you a trainer?</h2>
+              <p className="text-bg/70 mt-2 max-w-lg">
+                Get a free profile page that ranks on local Google search and sends clients
+                straight to your Instagram or TikTok. Keep 100% of what you earn.
+              </p>
+            </div>
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
+              <ButtonLink href="/signup" size="lg" className="shrink-0">
+                Create your free profile
+              </ButtonLink>
+              <Link
+                href="/for-trainers"
+                className="text-bg/80 hover:text-bg shrink-0 underline underline-offset-4"
+              >
+                See how it works
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
-            <ButtonLink href="/signup" size="lg" className="shrink-0">
-              Create your free profile
-            </ButtonLink>
-            <Link
-              href="/for-trainers"
-              className="text-bg/80 hover:text-bg shrink-0 underline underline-offset-4"
-            >
-              See how it works
-            </Link>
-          </div>
+          <Image
+            src="/images/are-you-a-trainer.png"
+            alt="A personal trainer creating their FitnessMode profile card"
+            width={1024}
+            height={1024}
+            className="mx-auto w-full max-w-xs md:w-2/5"
+          />
         </div>
       </section>
     </>

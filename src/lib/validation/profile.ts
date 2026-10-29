@@ -84,7 +84,8 @@ const optionalPhone = z
 
 export const basicsShape = {
   displayName: z.string().trim().min(2, "Enter your name").max(80),
-  cityId: z.number({ error: "Choose your city" }).int().positive("Choose your city"),
+  cityId: z.number({ error: "Choose your city" }).int().nonnegative("Choose your city"),
+  customLocation: z.string().trim().max(120).optional().default(""),
   headline: z.string().trim().max(120).optional().default(""),
   bio: z
     .string()
@@ -114,6 +115,8 @@ export const linksShape = {
 };
 
 type RefineInput = {
+  cityId: number;
+  customLocation: string;
   rateMin: number | null;
   rateMax: number | null;
   instagramUrl: string | null;
@@ -122,6 +125,13 @@ type RefineInput = {
 };
 
 function refineProfile(data: RefineInput, ctx: z.RefinementCtx) {
+  if (data.cityId <= 0 && data.customLocation.length < 2) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["cityId"],
+      message: "Choose your city, or tap below to enter your town or area",
+    });
+  }
   if (data.rateMin !== null && data.rateMax !== null && data.rateMin > data.rateMax) {
     ctx.addIssue({ code: "custom", path: ["rateMax"], message: "Max rate must be ≥ min rate" });
   }
@@ -140,11 +150,71 @@ export const profileSchema = z
 
 export const emailSchema = z.string().trim().toLowerCase().pipe(z.email("Enter a valid email"));
 
+// ---------------------------------------------------------------------------
+// Dashboard-only details (not part of the signup wizard)
+// ---------------------------------------------------------------------------
+
+const optionalIdList = (max: number) =>
+  z
+    .array(z.string())
+    .max(max, `Choose up to ${max}`)
+    .transform((ids) => ids.map(Number).filter((id) => Number.isInteger(id) && id > 0));
+
+const educationEntrySchema = z.object({
+  degree: z.string().trim().min(2, "Enter a degree or certification").max(120),
+  institution: z.string().trim().max(120).optional().default(""),
+  year: z
+    .string()
+    .trim()
+    .regex(/^(\d{4})?$/, "Use a 4-digit year")
+    .transform((value) => (value === "" ? null : Number(value)))
+    .refine(
+      (value) => value === null || (value >= 1950 && value <= new Date().getFullYear()),
+      "Enter a valid year",
+    ),
+});
+
+export const detailsShape = {
+  sessionTypeIds: optionalIdList(4),
+  amenityIds: optionalIdList(12),
+  languages: z
+    .array(z.string().trim().min(1).max(40, "Keep each language under 40 characters"))
+    .max(10, "Add up to 10 languages")
+    .transform((values) => {
+      const seen = new Set<string>();
+      return values
+        .map((value) => value.replace(/\s+/g, " "))
+        .filter((value) => {
+          const key = value.toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+    }),
+  education: z.array(educationEntrySchema).max(12, "Add up to 12 entries"),
+};
+
+export const detailsSchema = z.object(detailsShape);
+
+export type DetailsFormInput = z.input<typeof detailsSchema>;
+export type DetailsFormValues = z.output<typeof detailsSchema>;
+export type EducationEntry = z.output<typeof educationEntrySchema>;
+
+export const emptyDetailsInput: DetailsFormInput = {
+  sessionTypeIds: [],
+  amenityIds: [],
+  languages: [],
+  education: [],
+};
+
 export type ProfileFormInput = z.input<typeof profileSchema>;
 export type ProfileFormValues = z.output<typeof profileSchema>;
 
 export const SIGNUP_STEPS = [
-  { title: "About you", fields: ["displayName", "cityId", "headline", "bio"] },
+  {
+    title: "About you",
+    fields: ["displayName", "cityId", "customLocation", "headline", "bio"],
+  },
   {
     title: "Your services",
     fields: ["categoryIds", "modalityIds", "specialtyIds", "rateMin", "rateMax", "currency"],
@@ -155,6 +225,7 @@ export const SIGNUP_STEPS = [
 export const emptyProfileInput: ProfileFormInput = {
   displayName: "",
   cityId: 0,
+  customLocation: "",
   headline: "",
   bio: "",
   categoryIds: [],

@@ -4,7 +4,13 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getTrainerBySlug, getTrainerContact, type Trainer } from "@/lib/db/queries";
 import { formatRate } from "@/lib/format";
 import { breadcrumbJsonLd, trainerPersonJsonLd } from "@/lib/seo/jsonld";
-import { absoluteUrl, cityPath, profilePath } from "@/lib/seo/site";
+import {
+  absoluteUrl,
+  cityPath,
+  REMOTE_CITY_SLUG,
+  trainerLocationName,
+  trainerProfilePath,
+} from "@/lib/seo/site";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -29,10 +35,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const trainer = await getTrainerBySlug(slug);
   if (!trainer) return {};
   const role = trainer.categories[0]?.name ?? "Personal Trainer";
-  const title = `${trainer.displayName} — ${role} in ${trainer.city.name}`;
-  const description =
-    trainer.headline ?? trainer.bio?.slice(0, 155) ?? `${role} in ${trainer.city.name}.`;
-  const path = profilePath(trainer.city.slug, trainer.slug);
+  const location = trainerLocationName(trainer);
+  const title = `${trainer.displayName} — ${role} in ${location}`;
+  const description = trainer.headline ?? trainer.bio?.slice(0, 155) ?? `${role} in ${location}.`;
+  const path = trainerProfilePath(trainer);
   return {
     title,
     description,
@@ -65,10 +71,11 @@ export default async function TrainerProfilePage({ params }: Props) {
   const { city: citySlug, slug } = await params;
   const trainer = await getTrainerBySlug(slug);
   if (!trainer) notFound();
-  if (trainer.city.slug !== citySlug)
-    permanentRedirect(profilePath(trainer.city.slug, trainer.slug));
+  const expectedCity = trainer.city?.slug ?? REMOTE_CITY_SLUG;
+  if (expectedCity !== citySlug) permanentRedirect(trainerProfilePath(trainer));
 
   const ctas = await buildCtas(trainer);
+  const location = trainerLocationName(trainer);
   const rate = formatRate(trainer.rateMin, trainer.rateMax, trainer.currency);
 
   return (
@@ -82,8 +89,10 @@ export default async function TrainerProfilePage({ params }: Props) {
           }),
           breadcrumbJsonLd([
             { name: "Home", path: "/" },
-            { name: `Trainers in ${trainer.city.name}`, path: cityPath(trainer.city.slug) },
-            { name: trainer.displayName, path: profilePath(trainer.city.slug, trainer.slug) },
+            trainer.city
+              ? { name: `Trainers in ${trainer.city.name}`, path: cityPath(trainer.city.slug) }
+              : { name: "Trainers", path: "/search" },
+            { name: trainer.displayName, path: trainerProfilePath(trainer) },
           ]),
         ]}
       />
@@ -92,10 +101,15 @@ export default async function TrainerProfilePage({ params }: Props) {
           Home
         </Link>{" "}
         /{" "}
-        <Link href={cityPath(trainer.city.slug)} className="hover:text-text">
-          {trainer.city.name}
-        </Link>{" "}
-        / <span className="text-text">{trainer.displayName}</span>
+        {trainer.city ? (
+          <>
+            <Link href={cityPath(trainer.city.slug)} className="hover:text-text">
+              {trainer.city.name}
+            </Link>{" "}
+            /{" "}
+          </>
+        ) : null}
+        <span className="text-text">{trainer.displayName}</span>
       </nav>
 
       <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
@@ -108,15 +122,14 @@ export default async function TrainerProfilePage({ params }: Props) {
                 {trainer.tier === "pro" ? <Badge tone="pro">Verified trainer</Badge> : null}
               </div>
               <p className="text-text-muted mt-1">
-                {trainer.categories.map((category) => category.name).join(" · ")} in{" "}
-                {trainer.city.name}
+                {trainer.categories.map((category) => category.name).join(" · ")} in {location}
               </p>
               {trainer.headline ? <p className="mt-2 text-lg">{trainer.headline}</p> : null}
             </div>
             <div className="flex items-center gap-1">
               <FavoriteButton slug={trainer.slug} className="shrink-0" />
               <ShareButton
-                url={absoluteUrl(profilePath(trainer.city.slug, trainer.slug))}
+                url={absoluteUrl(trainerProfilePath(trainer))}
                 title={trainer.displayName}
                 className="shrink-0"
               />
@@ -129,10 +142,41 @@ export default async function TrainerProfilePage({ params }: Props) {
         <TrainerCtaButtons profileId={trainer.id} ctas={ctas} />
       </div>
 
+      {trainer.photos.length ? (
+        <section className="mt-8">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {trainer.photos.map((photo) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={photo.id}
+                src={photo.url}
+                alt={`${trainer.displayName} gallery photo`}
+                loading="lazy"
+                className="border-border aspect-square w-full rounded-xl border object-cover"
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="mt-10 grid gap-6 md:grid-cols-[1fr_16rem]">
         <section>
           <h2 className="text-lg font-semibold">About</h2>
           <p className="text-text-muted mt-3 whitespace-pre-line">{trainer.bio}</p>
+          {trainer.education.length ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold">Academic background</h3>
+              <ul className="mt-2 flex flex-col gap-1.5">
+                {trainer.education.map((entry, index) => (
+                  <li key={index} className="text-text-muted text-sm">
+                    <span className="text-text font-medium">{entry.degree}</span>
+                    {entry.institution ? ` — ${entry.institution}` : ""}
+                    {entry.year ? `, ${entry.year}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
         <Card className="flex flex-col gap-5">
           {rate ? (
@@ -153,12 +197,44 @@ export default async function TrainerProfilePage({ params }: Props) {
               </div>
             </div>
           ) : null}
+          {trainer.sessionTypes.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Session format</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.sessionTypes.map((sessionType) => (
+                  <Badge key={sessionType.slug} tone="brand">
+                    {sessionType.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {trainer.specialties.length ? (
             <div>
               <h2 className="text-text-muted text-sm">Specialties</h2>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {trainer.specialties.map((specialty) => (
                   <Badge key={specialty.slug}>{specialty.name}</Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {trainer.languages.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Languages</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.languages.map((language) => (
+                  <Badge key={language}>{language}</Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {trainer.amenities.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Extras</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.amenities.map((amenity) => (
+                  <Badge key={amenity.slug}>{amenity.name}</Badge>
                 ))}
               </div>
             </div>

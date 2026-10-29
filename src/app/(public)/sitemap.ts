@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getSitemapEntries } from "@/lib/db/queries";
-import { absoluteUrl, cityPath, profilePath } from "@/lib/seo/site";
+import { absoluteUrl, cityPath, trainerProfilePath } from "@/lib/seo/site";
 
 export const revalidate = 3600;
 
@@ -15,7 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     })),
     ...profiles.map((profile) => ({
-      url: absoluteUrl(profilePath(profile.city.slug, profile.slug)),
+      url: absoluteUrl(trainerProfilePath(profile)),
       lastModified: profile.updated_at,
       changeFrequency: "weekly" as const,
       priority: 0.7,

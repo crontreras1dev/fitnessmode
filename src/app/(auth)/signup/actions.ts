@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createProfile } from "@/lib/db/profile-mutations";
 import { absoluteUrl } from "@/lib/seo/site";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { emailSchema, profileSchema, type ProfileFormInput } from "@/lib/validation/profile";
 
@@ -35,6 +36,20 @@ export async function submitSignup(input: {
   const email = emailSchema.safeParse(input.email ?? "");
   if (!email.success)
     return { ok: false, error: "Enter a valid email to receive your sign-in link." };
+
+  // Server-side copy of the wizard answers. `options.data` below only reaches
+  // user_metadata when the OTP creates a *new* auth user — for emails that
+  // already exist in auth.users it is ignored, so /auth/callback falls back to
+  // this table. Raw input is stored; it's re-validated before profile creation.
+  const admin = createAdminClient();
+  if (admin) {
+    const { error: pendingError } = await admin
+      .from("pending_signups")
+      .upsert({ email: email.data, profile: input.profile });
+    if (pendingError) {
+      console.error("pending_signups upsert failed", { error: pendingError });
+    }
+  }
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email.data,

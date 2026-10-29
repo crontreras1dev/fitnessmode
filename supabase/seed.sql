@@ -25,6 +25,23 @@ insert into public.specialties (slug, name, sort_order) values
   ('senior-fitness', 'Senior fitness', 9)
 on conflict (slug) do nothing;
 
+insert into public.session_types (slug, name, sort_order) values
+  ('personal', 'Personal (1-on-1)', 1),
+  ('semi-personal', 'Semi-personal', 2),
+  ('group', 'Group', 3)
+on conflict (slug) do nothing;
+
+insert into public.amenities (slug, name, sort_order) values
+  ('wi-fi', 'Wi-Fi', 1),
+  ('parking', 'Parking', 2),
+  ('air-conditioning', 'Air conditioning', 3),
+  ('lockers', 'Lockers', 4),
+  ('showers', 'Showers', 5),
+  ('changing-room', 'Changing room', 6),
+  ('equipment-included', 'Equipment included', 7),
+  ('water-station', 'Water station', 8)
+on conflict (slug) do nothing;
+
 insert into public.cities (slug, name, region, country_code, latitude, longitude, is_published) values
   ('madrid', 'Madrid', 'Community of Madrid', 'ES', 40.4168, -3.7038, true),
   ('barcelona', 'Barcelona', 'Catalonia', 'ES', 41.3874, 2.1686, true),

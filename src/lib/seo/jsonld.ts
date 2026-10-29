@@ -1,4 +1,4 @@
-import { absoluteUrl, profilePath } from "./site";
+import { absoluteUrl, profilePath, trainerLocationName, trainerProfilePath } from "./site";
 
 type CityRef = { slug: string; name: string; country_code?: string | null };
 
@@ -8,7 +8,8 @@ type TrainerRef = {
   headline?: string | null;
   bio?: string | null;
   avatarUrl?: string | null;
-  city: { slug: string; name: string };
+  city: { slug: string; name: string } | null;
+  customLocation?: string | null;
   sameAs?: (string | null | undefined)[];
   categories?: { name: string }[];
 };
@@ -37,8 +38,11 @@ export function trainerPersonJsonLd(trainer: TrainerRef) {
     jobTitle: trainer.categories?.[0]?.name ?? "Personal Trainer",
     description: trainer.headline ?? trainer.bio ?? undefined,
     image: trainer.avatarUrl ?? undefined,
-    url: absoluteUrl(profilePath(trainer.city.slug, trainer.slug)),
-    address: { "@type": "PostalAddress", addressLocality: trainer.city.name },
+    url: absoluteUrl(trainerProfilePath(trainer)),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: trainerLocationName(trainer),
+    },
     sameAs: sameAs.length ? sameAs : undefined,
   };
 }

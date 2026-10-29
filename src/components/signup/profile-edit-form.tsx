@@ -22,7 +22,7 @@ export function ProfileEditForm({
 }: {
   taxonomy: Taxonomy;
   defaultValues: ProfileFormInput;
-  initialCity: CitySuggestion;
+  initialCity: CitySuggestion | null;
 }) {
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();

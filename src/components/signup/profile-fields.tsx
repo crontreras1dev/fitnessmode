@@ -29,8 +29,13 @@ export function BasicsFields({
   initialCity?: CitySuggestion | null;
 }) {
   const [city, setCity] = useState<CitySuggestion | null>(initialCity ?? null);
+  const [customMode, setCustomMode] = useState(
+    () => !initialCity && Boolean(form.getValues("customLocation")),
+  );
   const name = errorProps(form, "displayName");
   const cityError = errorProps(form, "cityId");
+  const customLocation = errorProps(form, "customLocation");
+  const locationError = cityError.error ?? customLocation.error;
   const headline = errorProps(form, "headline");
   const bio = errorProps(form, "bio");
   return (
@@ -45,26 +50,51 @@ export function BasicsFields({
       </Field>
       <Field
         label="City"
-        htmlFor="cityId"
-        error={cityError.error}
+        htmlFor={customMode ? "customLocation" : "cityId"}
+        error={locationError}
         hint="Where you train clients in person (or where you're based if you coach online)."
       >
-        <Controller
-          control={form.control}
-          name="cityId"
-          render={({ field }) => (
-            <CityAutocomplete
-              id="cityId"
-              value={city}
-              invalid={cityError.invalid}
-              placeholder="Start typing your city"
-              onChange={(next) => {
-                setCity(next);
-                field.onChange(next?.id ?? 0);
-              }}
-            />
-          )}
-        />
+        {customMode ? (
+          <Input
+            id="customLocation"
+            placeholder="e.g. Santa Fe, NM — or Online only"
+            maxLength={120}
+            aria-invalid={cityError.invalid || customLocation.invalid || undefined}
+            {...form.register("customLocation")}
+          />
+        ) : (
+          <Controller
+            control={form.control}
+            name="cityId"
+            render={({ field }) => (
+              <CityAutocomplete
+                id="cityId"
+                value={city}
+                invalid={cityError.invalid}
+                placeholder="Start typing your city"
+                onChange={(next) => {
+                  setCity(next);
+                  field.onChange(next?.id ?? 0);
+                }}
+              />
+            )}
+          />
+        )}
+        <button
+          type="button"
+          className="text-brand mt-1.5 self-start text-sm font-medium hover:underline"
+          onClick={() => {
+            if (customMode) {
+              form.setValue("customLocation", "", { shouldValidate: true });
+            } else {
+              setCity(null);
+              form.setValue("cityId", 0, { shouldValidate: true });
+            }
+            setCustomMode(!customMode);
+          }}
+        >
+          {customMode ? "Choose from listed cities" : "My city isn't listed"}
+        </button>
       </Field>
       <Field
         label="Headline (optional)"
@@ -242,7 +272,7 @@ export function LinksFields({ form }: { form: ProfileForm }) {
 }
 
 export const STEP_FIELDS = {
-  basics: ["displayName", "cityId", "headline", "bio"],
+  basics: ["displayName", "cityId", "customLocation", "headline", "bio"],
   services: ["categoryIds", "modalityIds", "specialtyIds", "rateMin", "rateMax", "currency"],
   links: ["instagramUrl", "tiktokUrl", "websiteUrl", "whatsapp", "phone"],
 } as const satisfies Record<string, readonly (keyof ProfileFormInput)[]>;
