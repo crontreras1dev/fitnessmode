@@ -138,8 +138,8 @@ export default async function HomePage() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Are you a trainer?</h2>
               <p className="text-bg/70 mt-2 max-w-lg">
-                Get a free profile page that ranks on local Google search and sends clients
-                straight to your Instagram or TikTok. Keep 100% of what you earn.
+                Get a free profile page that ranks on local Google search and sends clients straight
+                to your Instagram or TikTok. Keep 100% of what you earn.
               </p>
             </div>
             <div className="flex flex-col items-center gap-4 sm:flex-row">
