@@ -3,6 +3,27 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      amenities: {
+        Row: {
+          id: number;
+          name: string;
+          slug: string;
+          sort_order: number;
+        };
+        Insert: {
+          id?: never;
+          name: string;
+          slug: string;
+          sort_order?: number;
+        };
+        Update: {
+          id?: never;
+          name?: string;
+          slug?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       categories: {
         Row: {
           description: string | null;
@@ -83,6 +104,36 @@ export type Database = {
           sort_order?: number;
         };
         Relationships: [];
+      };
+      profile_amenities: {
+        Row: {
+          amenity_id: number;
+          profile_id: string;
+        };
+        Insert: {
+          amenity_id: number;
+          profile_id: string;
+        };
+        Update: {
+          amenity_id?: number;
+          profile_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_amenities_amenity_id_fkey";
+            columns: ["amenity_id"];
+            isOneToOne: false;
+            referencedRelation: "amenities";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "profile_amenities_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       pending_signups: {
         Row: {
@@ -197,6 +248,68 @@ export type Database = {
           },
         ];
       };
+      profile_photos: {
+        Row: {
+          created_at: string;
+          id: number;
+          path: string;
+          profile_id: string;
+          sort_order: number;
+        };
+        Insert: {
+          created_at?: string;
+          id?: never;
+          path: string;
+          profile_id: string;
+          sort_order?: number;
+        };
+        Update: {
+          created_at?: string;
+          id?: never;
+          path?: string;
+          profile_id?: string;
+          sort_order?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_photos_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      profile_session_types: {
+        Row: {
+          profile_id: string;
+          session_type_id: number;
+        };
+        Insert: {
+          profile_id: string;
+          session_type_id: number;
+        };
+        Update: {
+          profile_id?: string;
+          session_type_id?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profile_session_types_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "profile_session_types_session_type_id_fkey";
+            columns: ["session_type_id"];
+            isOneToOne: false;
+            referencedRelation: "session_types";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profile_specialties: {
         Row: {
           profile_id: string;
@@ -236,9 +349,11 @@ export type Database = {
           currency: string;
           custom_location: string | null;
           display_name: string;
+          education: Json;
           headline: string | null;
           id: string;
           instagram_url: string | null;
+          languages: string[];
           phone: string | null;
           rate_max: number | null;
           rate_min: number | null;
@@ -259,9 +374,11 @@ export type Database = {
           currency?: string;
           custom_location?: string | null;
           display_name: string;
+          education?: Json;
           headline?: string | null;
           id: string;
           instagram_url?: string | null;
+          languages?: string[];
           phone?: string | null;
           rate_max?: number | null;
           rate_min?: number | null;
@@ -282,9 +399,11 @@ export type Database = {
           currency?: string;
           custom_location?: string | null;
           display_name?: string;
+          education?: Json;
           headline?: string | null;
           id?: string;
           instagram_url?: string | null;
+          languages?: string[];
           phone?: string | null;
           rate_max?: number | null;
           rate_min?: number | null;
@@ -306,6 +425,27 @@ export type Database = {
             referencedColumns: ["id"];
           },
         ];
+      };
+      session_types: {
+        Row: {
+          id: number;
+          name: string;
+          slug: string;
+          sort_order: number;
+        };
+        Insert: {
+          id?: never;
+          name: string;
+          slug: string;
+          sort_order?: number;
+        };
+        Update: {
+          id?: never;
+          name?: string;
+          slug?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
       };
       specialties: {
         Row: {

@@ -142,10 +142,41 @@ export default async function TrainerProfilePage({ params }: Props) {
         <TrainerCtaButtons profileId={trainer.id} ctas={ctas} />
       </div>
 
+      {trainer.photos.length ? (
+        <section className="mt-8">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {trainer.photos.map((photo) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={photo.id}
+                src={photo.url}
+                alt={`${trainer.displayName} gallery photo`}
+                loading="lazy"
+                className="border-border aspect-square w-full rounded-xl border object-cover"
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="mt-10 grid gap-6 md:grid-cols-[1fr_16rem]">
         <section>
           <h2 className="text-lg font-semibold">About</h2>
           <p className="text-text-muted mt-3 whitespace-pre-line">{trainer.bio}</p>
+          {trainer.education.length ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold">Academic background</h3>
+              <ul className="mt-2 flex flex-col gap-1.5">
+                {trainer.education.map((entry, index) => (
+                  <li key={index} className="text-text-muted text-sm">
+                    <span className="text-text font-medium">{entry.degree}</span>
+                    {entry.institution ? ` — ${entry.institution}` : ""}
+                    {entry.year ? `, ${entry.year}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
         <Card className="flex flex-col gap-5">
           {rate ? (
@@ -166,12 +197,44 @@ export default async function TrainerProfilePage({ params }: Props) {
               </div>
             </div>
           ) : null}
+          {trainer.sessionTypes.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Session format</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.sessionTypes.map((sessionType) => (
+                  <Badge key={sessionType.slug} tone="brand">
+                    {sessionType.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
           {trainer.specialties.length ? (
             <div>
               <h2 className="text-text-muted text-sm">Specialties</h2>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {trainer.specialties.map((specialty) => (
                   <Badge key={specialty.slug}>{specialty.name}</Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {trainer.languages.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Languages</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.languages.map((language) => (
+                  <Badge key={language}>{language}</Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {trainer.amenities.length ? (
+            <div>
+              <h2 className="text-text-muted text-sm">Extras</h2>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {trainer.amenities.map((amenity) => (
+                  <Badge key={amenity.slug}>{amenity.name}</Badge>
                 ))}
               </div>
             </div>

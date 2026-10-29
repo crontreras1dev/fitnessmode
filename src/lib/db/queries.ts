@@ -3,7 +3,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { cache } from "react";
 import { createPublicClient } from "@/lib/supabase/public";
 import type { SearchFilters } from "@/lib/validation/search";
-import type { Database, Tables } from "./types";
+import type { EducationEntry } from "@/lib/validation/profile";
+import { galleryPhotoUrl } from "@/lib/gallery";
+import type { Database, Json, Tables } from "./types";
 
 type Client = SupabaseClient<Database>;
 
@@ -17,7 +19,23 @@ export type ProfileTier = Database["public"]["Enums"]["profile_tier"];
 const CITY_COLUMNS = "id, slug, name, region, country_code, latitude, longitude, is_published";
 
 const TRAINER_SELECT =
-  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, custom_location, city:cities(slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name))";
+  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, custom_location, languages, education, city:cities(slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name)), profile_session_types(session_types(id, slug, name)), profile_amenities(amenities(id, slug, name)), profile_photos(id, path, sort_order)";
+
+function parseEducation(value: Json): EducationEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!entry || typeof entry !== "object") return [];
+    const { degree, institution, year } = entry as Record<string, unknown>;
+    if (typeof degree !== "string" || degree.length < 2) return [];
+    return [
+      {
+        degree,
+        institution: typeof institution === "string" ? institution : "",
+        year: typeof year === "number" && Number.isInteger(year) ? year : null,
+      },
+    ];
+  });
+}
 
 export const PAGE_SIZE = 24;
 
@@ -43,9 +61,16 @@ function mapTrainer(row: TrainerRow) {
     updatedAt: row.updated_at,
     city: row.city,
     customLocation: row.custom_location,
+    languages: row.languages,
+    education: parseEducation(row.education),
     categories: row.profile_categories.map((item) => item.categories).filter(notNull),
     modalities: row.profile_modalities.map((item) => item.modalities).filter(notNull),
     specialties: row.profile_specialties.map((item) => item.specialties).filter(notNull),
+    sessionTypes: row.profile_session_types.map((item) => item.session_types).filter(notNull),
+    amenities: row.profile_amenities.map((item) => item.amenities).filter(notNull),
+    photos: row.profile_photos
+      .sort((a, b) => a.sort_order - b.sort_order || a.id - b.id)
+      .map((photo) => ({ id: photo.id, url: galleryPhotoUrl(photo.path) })),
   };
 }
 
@@ -58,16 +83,27 @@ export type Trainer = ReturnType<typeof mapTrainer>;
 
 export async function getTaxonomy() {
   const client = createPublicClient();
-  if (!client) return { categories: [], modalities: [], specialties: [] };
-  const [categories, modalities, specialties] = await Promise.all([
+  const empty = {
+    categories: [] as Term[],
+    modalities: [] as Term[],
+    specialties: [] as Term[],
+    sessionTypes: [] as Term[],
+    amenities: [] as Term[],
+  };
+  if (!client) return empty;
+  const [categories, modalities, specialties, sessionTypes, amenities] = await Promise.all([
     client.from("categories").select("id, slug, name").order("sort_order"),
     client.from("modalities").select("id, slug, name").order("sort_order"),
     client.from("specialties").select("id, slug, name").order("sort_order"),
+    client.from("session_types").select("id, slug, name").order("sort_order"),
+    client.from("amenities").select("id, slug, name").order("sort_order"),
   ]);
   return {
     categories: (categories.data ?? []) as Term[],
     modalities: (modalities.data ?? []) as Term[],
     specialties: (specialties.data ?? []) as Term[],
+    sessionTypes: (sessionTypes.data ?? []) as Term[],
+    amenities: (amenities.data ?? []) as Term[],
   };
 }
 export type Taxonomy = Awaited<ReturnType<typeof getTaxonomy>>;

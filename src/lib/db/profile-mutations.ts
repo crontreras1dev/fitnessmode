@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { ProfileFormValues } from "@/lib/validation/profile";
+import type { DetailsFormValues, ProfileFormValues } from "@/lib/validation/profile";
 import { profileSchema } from "@/lib/validation/profile";
 import { slugify } from "@/lib/seo/slug";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -71,6 +71,51 @@ export async function updateProfile(client: Client, userId: string, values: Prof
   await replaceTaxonomy(client, userId, values);
 }
 
+async function replaceDetailsTaxonomy(
+  client: Client,
+  profileId: string,
+  values: DetailsFormValues,
+) {
+  const results = await Promise.all([
+    client.from("profile_session_types").delete().eq("profile_id", profileId),
+    client.from("profile_amenities").delete().eq("profile_id", profileId),
+  ]);
+  const deleteError = results.find((result) => result.error)?.error;
+  if (deleteError) throw deleteError;
+
+  const inserts = await Promise.all([
+    values.sessionTypeIds.length
+      ? client.from("profile_session_types").insert(
+          values.sessionTypeIds.map((session_type_id) => ({
+            profile_id: profileId,
+            session_type_id,
+          })),
+        )
+      : Promise.resolve({ error: null }),
+    values.amenityIds.length
+      ? client
+          .from("profile_amenities")
+          .insert(values.amenityIds.map((amenity_id) => ({ profile_id: profileId, amenity_id })))
+      : Promise.resolve({ error: null }),
+  ]);
+  const insertError = inserts.find((result) => result.error)?.error;
+  if (insertError) throw insertError;
+}
+
+/** Dashboard-only details: languages, education, session types, amenities. */
+export async function updateProfileDetails(
+  client: Client,
+  userId: string,
+  values: DetailsFormValues,
+) {
+  const { error } = await client
+    .from("profiles")
+    .update({ languages: values.languages, education: values.education })
+    .eq("id", userId);
+  if (error) throw error;
+  await replaceDetailsTaxonomy(client, userId, values);
+}
+
 /** Pending wizard answers are only honored for this long after the link was sent. */
 const PENDING_SIGNUP_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -129,7 +174,7 @@ export async function getOwnProfile(client: Client, userId: string) {
   const { data, error } = await client
     .from("profiles")
     .select(
-      "id, slug, display_name, headline, bio, city_id, custom_location, avatar_url, instagram_url, tiktok_url, website_url, rate_min, rate_max, currency, tier, status, city:cities(id, slug, name, region, country_code, is_published), profile_categories(category_id), profile_modalities(modality_id), profile_specialties(specialty_id)",
+      "id, slug, display_name, headline, bio, city_id, custom_location, avatar_url, instagram_url, tiktok_url, website_url, rate_min, rate_max, currency, tier, status, languages, education, city:cities(id, slug, name, region, country_code, is_published), profile_categories(category_id), profile_modalities(modality_id), profile_specialties(specialty_id), profile_session_types(session_type_id), profile_amenities(amenity_id), profile_photos(id, path, sort_order)",
     )
     .eq("id", userId)
     .maybeSingle();
