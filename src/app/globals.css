@@ -41,6 +41,12 @@
     @apply bg-bg text-text font-sans antialiased;
   }
 
+  a,
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
   :focus-visible {
     @apply outline-brand outline-2 outline-offset-2;
   }
