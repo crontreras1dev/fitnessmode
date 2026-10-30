@@ -69,7 +69,7 @@ export function FavoritesList() {
   if (status === "error") {
     return (
       <div className="rounded-card border-border flex flex-col items-start gap-4 border border-dashed p-8">
-        <h2 className="text-lg font-semibold">Couldn&apos;t load your saved trainers</h2>
+        <h2 className="text-lg font-semibold">Couldn&apos;t load your favorites</h2>
         <p className="text-text-muted">Check your connection and try again.</p>
       </div>
     );
@@ -78,7 +78,7 @@ export function FavoritesList() {
   if (!slugs.length || !trainers.length) {
     return (
       <div className="rounded-card border-border flex flex-col items-start gap-4 border border-dashed p-8">
-        <h2 className="text-lg font-semibold">No saved trainers yet</h2>
+        <h2 className="text-lg font-semibold">No favorites yet</h2>
         <p className="text-text-muted">
           Tap the heart on any trainer card or profile and they&apos;ll show up here. No account
           needed — your list is saved on this device.

@@ -13,7 +13,7 @@ export function SiteFooter() {
             Find a trainer
           </Link>
           <Link href="/favorites" className="hover:text-text">
-            Saved trainers
+            Favorites
           </Link>
           <Link href="/for-trainers" className="hover:text-text">
             For trainers
