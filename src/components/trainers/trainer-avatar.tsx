@@ -5,20 +5,29 @@ export function TrainerAvatar({
   name,
   avatarUrl,
   size = "md",
+  shape = "circle",
 }: {
   name: string;
   avatarUrl?: string | null;
-  size?: "md" | "lg" | "xl";
+  size?: "md" | "lg" | "xl" | "fluid";
+  shape?: "circle" | "square";
 }) {
   const sizeClasses =
-    size === "xl" ? "size-32 text-3xl" : size === "lg" ? "size-24 text-2xl" : "size-14 text-lg";
+    size === "fluid"
+      ? "aspect-square w-full text-4xl"
+      : size === "xl"
+        ? "size-32 text-3xl"
+        : size === "lg"
+          ? "size-24 text-2xl"
+          : "size-14 text-lg";
+  const shapeClass = shape === "square" ? "rounded-xl" : "rounded-full";
   if (avatarUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- arbitrary trainer-provided hosts
       <img
         src={avatarUrl}
         alt=""
-        className={cn("shrink-0 rounded-full object-cover", sizeClasses)}
+        className={cn("shrink-0 object-cover", shapeClass, sizeClasses)}
         loading="lazy"
       />
     );
@@ -27,7 +36,8 @@ export function TrainerAvatar({
     <span
       aria-hidden
       className={cn(
-        "bg-brand-soft text-brand-strong inline-flex shrink-0 items-center justify-center rounded-full font-semibold",
+        "bg-brand-soft text-brand-strong inline-flex shrink-0 items-center justify-center font-semibold",
+        shapeClass,
         sizeClasses,
       )}
     >

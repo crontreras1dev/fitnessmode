@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { getTrainerBySlug, getTrainerContact, type Trainer } from "@/lib/db/queries";
+import {
+  getSuggestedTrainers,
+  getTrainerBySlug,
+  getTrainerContact,
+  type Trainer,
+} from "@/lib/db/queries";
 import { formatRate } from "@/lib/format";
 import { breadcrumbJsonLd, trainerPersonJsonLd } from "@/lib/seo/jsonld";
 import {
@@ -18,7 +23,9 @@ import { FavoriteButton } from "@/components/trainers/favorite-button";
 import { ShareButton } from "@/components/trainers/share-button";
 import { TrackView } from "@/components/trainers/track-view";
 import { TrainerAvatar } from "@/components/trainers/trainer-avatar";
+import { TrainerGrid } from "@/components/trainers/trainer-card";
 import { TrainerCtaButtons, type TrainerCta } from "@/components/trainers/trainer-cta-buttons";
+import { TrainerSocialLinks } from "@/components/trainers/trainer-social-links";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -67,6 +74,32 @@ async function buildCtas(trainer: Trainer): Promise<TrainerCta[]> {
   return ctas;
 }
 
+const SOCIAL_TARGETS: ReadonlySet<string> = new Set(["instagram", "tiktok", "website"]);
+
+function BadgeSection({
+  title,
+  terms,
+  tone = "neutral",
+}: {
+  title: string;
+  terms: { slug: string; name: string }[];
+  tone?: "neutral" | "brand";
+}) {
+  if (!terms.length) return null;
+  return (
+    <section>
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {terms.map((term) => (
+          <Badge key={term.slug} tone={tone}>
+            {term.name}
+          </Badge>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default async function TrainerProfilePage({ params }: Props) {
   const { city: citySlug, slug } = await params;
   const trainer = await getTrainerBySlug(slug);
@@ -74,12 +107,17 @@ export default async function TrainerProfilePage({ params }: Props) {
   const expectedCity = trainer.city?.slug ?? REMOTE_CITY_SLUG;
   if (expectedCity !== citySlug) permanentRedirect(trainerProfilePath(trainer));
 
-  const ctas = await buildCtas(trainer);
+  const [ctas, suggestions] = await Promise.all([
+    buildCtas(trainer),
+    getSuggestedTrainers(trainer, 3),
+  ]);
+  const socialLinks = ctas.filter((cta) => SOCIAL_TARGETS.has(cta.target));
+  const contactCtas = ctas.filter((cta) => !SOCIAL_TARGETS.has(cta.target));
   const location = trainerLocationName(trainer);
   const rate = formatRate(trainer.rateMin, trainer.rateMax, trainer.currency);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <TrackView profileId={trainer.id} />
       <JsonLd
         data={[
@@ -112,61 +150,78 @@ export default async function TrainerProfilePage({ params }: Props) {
         <span className="text-text">{trainer.displayName}</span>
       </nav>
 
-      <header className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
-        <TrainerAvatar name={trainer.displayName} avatarUrl={trainer.avatarUrl} size="xl" />
-        <div className="flex-1">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="mt-8 grid gap-6 md:grid-cols-[2fr_1fr]">
+        <aside className="md:order-2">
+          <Card className="flex flex-col gap-5 md:sticky md:top-20">
+            <div className="relative">
+              <TrainerAvatar
+                name={trainer.displayName}
+                avatarUrl={trainer.avatarUrl}
+                size="fluid"
+                shape="square"
+              />
+              <FavoriteButton
+                slug={trainer.slug}
+                className="absolute top-2 right-2 shadow-sm"
+              />
+            </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl font-semibold tracking-tight">{trainer.displayName}</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">{trainer.displayName}</h1>
                 {trainer.tier === "pro" ? <Badge tone="pro">Verified trainer</Badge> : null}
               </div>
               <p className="text-text-muted mt-1">
-                {trainer.categories.map((category) => category.name).join(" · ")} in {location}
+                {trainer.categories.length
+                  ? `${trainer.categories.map((category) => category.name).join(" · ")} in ${location}`
+                  : location}
               </p>
-              {trainer.headline ? <p className="mt-2 text-lg">{trainer.headline}</p> : null}
+              {trainer.headline ? <p className="mt-2">{trainer.headline}</p> : null}
             </div>
             <div className="flex items-center gap-1">
-              <FavoriteButton slug={trainer.slug} className="shrink-0" />
+              <TrainerSocialLinks profileId={trainer.id} links={socialLinks} />
               <ShareButton
                 url={absoluteUrl(trainerProfilePath(trainer))}
                 title={trainer.displayName}
-                className="shrink-0"
               />
             </div>
-          </div>
-        </div>
-      </header>
+            {rate ? (
+              <div>
+                <h2 className="text-text-muted text-sm">Rate per session</h2>
+                <p className="mt-1 text-xl font-semibold">{rate}</p>
+              </div>
+            ) : null}
+            <TrainerCtaButtons profileId={trainer.id} ctas={contactCtas} />
+          </Card>
+        </aside>
 
-      <div className="mt-6">
-        <TrainerCtaButtons profileId={trainer.id} ctas={ctas} />
-      </div>
+        <div className="flex min-w-0 flex-col gap-10 md:order-1">
+          <section>
+            <h2 className="text-lg font-semibold">About</h2>
+            <p className="text-text-muted mt-3 whitespace-pre-line">{trainer.bio}</p>
+          </section>
 
-      {trainer.photos.length ? (
-        <section className="mt-8">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {trainer.photos.map((photo) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={photo.id}
-                src={photo.url}
-                alt={`${trainer.displayName} gallery photo`}
-                loading="lazy"
-                className="border-border aspect-square w-full rounded-xl border object-cover"
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
+          {trainer.photos.length ? (
+            <section>
+              <h2 className="text-lg font-semibold">Gallery</h2>
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {trainer.photos.map((photo) => (
+                  // eslint-disable-next-line @next/next/no-img-element -- arbitrary trainer-provided hosts
+                  <img
+                    key={photo.id}
+                    src={photo.url}
+                    alt={`${trainer.displayName} gallery photo`}
+                    loading="lazy"
+                    className="border-border aspect-square w-full rounded-xl border object-cover"
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
 
-      <div className="mt-10 grid gap-6 md:grid-cols-[1fr_16rem]">
-        <section>
-          <h2 className="text-lg font-semibold">About</h2>
-          <p className="text-text-muted mt-3 whitespace-pre-line">{trainer.bio}</p>
           {trainer.education.length ? (
-            <div className="mt-6">
-              <h3 className="text-sm font-semibold">Academic background</h3>
-              <ul className="mt-2 flex flex-col gap-1.5">
+            <section>
+              <h2 className="text-lg font-semibold">Academic background</h2>
+              <ul className="mt-3 flex flex-col gap-1.5">
                 {trainer.education.map((entry, index) => (
                   <li key={index} className="text-text-muted text-sm">
                     <span className="text-text font-medium">{entry.degree}</span>
@@ -175,72 +230,30 @@ export default async function TrainerProfilePage({ params }: Props) {
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
           ) : null}
-        </section>
-        <Card className="flex flex-col gap-5">
-          {rate ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Rate per session</h2>
-              <p className="mt-1 text-xl font-semibold">{rate}</p>
-            </div>
-          ) : null}
-          {trainer.modalities.length ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Trains</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {trainer.modalities.map((modality) => (
-                  <Badge key={modality.slug} tone="brand">
-                    {modality.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {trainer.sessionTypes.length ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Session format</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {trainer.sessionTypes.map((sessionType) => (
-                  <Badge key={sessionType.slug} tone="brand">
-                    {sessionType.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {trainer.specialties.length ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Specialties</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {trainer.specialties.map((specialty) => (
-                  <Badge key={specialty.slug}>{specialty.name}</Badge>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {trainer.languages.length ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Languages</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {trainer.languages.map((language) => (
-                  <Badge key={language}>{language}</Badge>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          {trainer.amenities.length ? (
-            <div>
-              <h2 className="text-text-muted text-sm">Extras</h2>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {trainer.amenities.map((amenity) => (
-                  <Badge key={amenity.slug}>{amenity.name}</Badge>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </Card>
+
+          <BadgeSection title="Trains" terms={trainer.modalities} tone="brand" />
+          <BadgeSection title="Session format" terms={trainer.sessionTypes} tone="brand" />
+          <BadgeSection title="Specialties" terms={trainer.specialties} />
+          <BadgeSection
+            title="Languages"
+            terms={trainer.languages.map((language) => ({ slug: language, name: language }))}
+          />
+          <BadgeSection title="Extras" terms={trainer.amenities} />
+        </div>
       </div>
+
+      {suggestions.length ? (
+        <section className="mt-14">
+          <h2 className="text-lg font-semibold">
+            {trainer.city ? `Other trainers in ${trainer.city.name}` : "Other trainers"}
+          </h2>
+          <div className="mt-4">
+            <TrainerGrid trainers={suggestions} showCity />
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

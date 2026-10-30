@@ -19,7 +19,7 @@ export type ProfileTier = Database["public"]["Enums"]["profile_tier"];
 const CITY_COLUMNS = "id, slug, name, region, country_code, latitude, longitude, is_published";
 
 const TRAINER_SELECT =
-  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, custom_location, languages, education, city:cities(slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name)), profile_session_types(session_types(id, slug, name)), profile_amenities(amenities(id, slug, name)), profile_photos(id, path, sort_order)";
+  "id, slug, display_name, headline, bio, avatar_url, rate_min, rate_max, currency, tier, instagram_url, tiktok_url, website_url, updated_at, custom_location, languages, education, city:cities(id, slug, name), profile_categories(categories(id, slug, name)), profile_modalities(modalities(id, slug, name)), profile_specialties(specialties(id, slug, name)), profile_session_types(session_types(id, slug, name)), profile_amenities(amenities(id, slug, name)), profile_photos(id, path, sort_order)";
 
 function parseEducation(value: Json): EducationEntry[] {
   if (!Array.isArray(value)) return [];
@@ -159,6 +159,25 @@ export const getTrainerBySlug = cache(async (slug: string) => {
   const { data } = await trainerQuery(client).eq("slug", slug).maybeSingle();
   return data ? mapTrainer(data) : null;
 });
+
+/** Trainers to suggest below a profile: same city first (or other remote
+ * profiles for remote trainers), falling back to any active profiles. */
+export async function getSuggestedTrainers(trainer: Trainer, limit = 6): Promise<Trainer[]> {
+  const client = createPublicClient();
+  if (!client) return [];
+
+  const query = (cityId?: number | null) => {
+    let q = trainerQuery(client).neq("id", trainer.id);
+    if (cityId !== undefined) {
+      q = cityId === null ? q.is("city_id", null) : q.eq("city_id", cityId);
+    }
+    return q.order("tier", { ascending: false }).order("created_at", { ascending: false }).limit(limit);
+  };
+  const run = async (q: ReturnType<typeof query>) => ((await q).data ?? []).map(mapTrainer);
+
+  const sameArea = await run(query(trainer.city ? trainer.city.id : null));
+  return sameArea.length ? sameArea : run(query());
+}
 
 /** WhatsApp / phone are only returned by the DB for active pro-tier profiles. */
 export async function getTrainerContact(profileId: string) {
