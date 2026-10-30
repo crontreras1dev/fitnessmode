@@ -102,7 +102,7 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
               onClick={() => remove(photo)}
               disabled={pending}
               aria-label="Remove photo"
-              className="bg-surface text-danger border-border absolute top-1.5 right-1.5 rounded-full border px-2 py-0.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
+              className="bg-surface text-danger border-border absolute top-1.5 right-1.5 rounded-xl border px-2 py-0.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
             >
               Remove
             </button>

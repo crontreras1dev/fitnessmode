@@ -42,7 +42,7 @@ export function ShareButton({
       onClick={onClick}
       aria-label={copied ? "Link copied" : "Share trainer profile"}
       className={cn(
-        "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-full border transition-colors",
+        "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-xl border transition-colors",
         className,
       )}
     >

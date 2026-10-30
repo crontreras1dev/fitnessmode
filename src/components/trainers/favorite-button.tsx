@@ -35,7 +35,7 @@ export function FavoriteButton({
       aria-label={saved ? `${label} (saved)` : label}
       aria-pressed={saved}
       className={cn(
-        "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-full border transition-colors",
+        "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-xl border transition-colors",
         saved && "border-danger/30 bg-danger-soft text-danger",
         className,
       )}
