@@ -41,10 +41,17 @@
     @apply bg-bg text-text font-sans antialiased;
   }
 
+<<<<<<< HEAD
   a[href],
   button:not(:disabled),
   select:not(:disabled) {
     @apply cursor-pointer;
+=======
+  a,
+  button,
+  [role="button"] {
+    cursor: pointer;
+>>>>>>> 9af0b824a3a983c00eee754bd5208499db43038d
   }
 
   :focus-visible {

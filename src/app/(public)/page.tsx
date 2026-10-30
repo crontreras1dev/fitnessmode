@@ -51,13 +51,13 @@ export default async function HomePage() {
           <div className="flex-1">
             <h2 className="text-2xl font-semibold tracking-tight">What is FitnessMode?</h2>
             <p className="text-text-muted mt-4">
-              Choosing a trainer from a Google search or an Instagram hashtag is a shot in the
-              dark — you can't easily compare specialties, rates, or locations side by side.
+              Choosing a trainer from a Google search or an Instagram hashtag is a shot in the dark
+              — you can&apos;t easily compare specialties, rates, or locations side by side.
             </p>
             <p className="text-text-muted mt-3">
               FitnessMode puts local trainers, coaches, and online professionals in one place.
-              Browse by city and modality, preview each trainer's real work through their social
-              feeds, and message them directly when you're ready.
+              Browse by city and modality, preview each trainer&apos;s real work through their
+              social feeds, and message them directly when you&apos;re ready.
             </p>
             <ul className="mt-5 flex flex-wrap gap-2">
               {[
@@ -138,8 +138,8 @@ export default async function HomePage() {
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Are you a trainer?</h2>
               <p className="text-bg/70 mt-2 max-w-lg">
-                Get a free profile page that ranks on local Google search and sends clients
-                straight to your Instagram or TikTok. Keep 100% of what you earn.
+                Get a free profile page that ranks on local Google search and sends clients straight
+                to your Instagram or TikTok. Keep 100% of what you earn.
               </p>
             </div>
             <div className="flex flex-col items-center gap-4 sm:flex-row">

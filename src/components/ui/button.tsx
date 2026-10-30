@@ -24,7 +24,11 @@ export function buttonClasses({
   className,
 }: { variant?: Variant; size?: Size; className?: string } = {}) {
   return cn(
+<<<<<<< HEAD
     "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
+=======
+    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
+>>>>>>> 9af0b824a3a983c00eee754bd5208499db43038d
     variants[variant],
     sizes[size],
     className,
