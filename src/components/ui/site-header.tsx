@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { FavoritesLink } from "@/components/trainers/favorites-link";
 import { ButtonLink } from "./button";
 
 export function SiteHeader() {
@@ -32,6 +33,7 @@ export function SiteHeader() {
           >
             Find a trainer
           </Link>
+          <FavoritesLink />
           {isAuthenticated === true ? (
             <>
               <form action="/auth/signout" method="post">

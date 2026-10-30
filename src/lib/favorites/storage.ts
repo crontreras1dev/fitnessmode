@@ -1,5 +1,8 @@
 const STORAGE_KEY = "fitnessmode:favorites";
 
+/** Dispatched on window after a favorite is toggled in this tab. */
+export const FAVORITES_CHANGED_EVENT = "favorites:changed";
+
 export function getFavorites(): string[] {
   if (typeof window === "undefined") return [];
   try {
@@ -21,5 +24,6 @@ export function toggleFavorite(slug: string): boolean {
   const exists = favorites.includes(slug);
   const next = exists ? favorites.filter((item) => item !== slug) : [...favorites, slug];
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  window.dispatchEvent(new Event(FAVORITES_CHANGED_EVENT));
   return !exists;
 }

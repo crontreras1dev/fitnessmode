@@ -145,6 +145,14 @@ export async function getFeaturedTrainers(limit = 24) {
   return (data ?? []).map(mapTrainer);
 }
 
+export async function getTrainersBySlugs(slugs: string[]) {
+  const client = createPublicClient();
+  if (!client || !slugs.length) return [];
+  const { data } = await trainerQuery(client).in("slug", slugs);
+  const bySlug = new Map((data ?? []).map((row) => [row.slug, mapTrainer(row)]));
+  return slugs.map((slug) => bySlug.get(slug)).filter(notNull);
+}
+
 export const getTrainerBySlug = cache(async (slug: string) => {
   const client = createPublicClient();
   if (!client) return null;

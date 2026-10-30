@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/components/ui/cn";
-import { isFavorite, toggleFavorite } from "@/lib/favorites/storage";
+import { FAVORITES_CHANGED_EVENT, isFavorite, toggleFavorite } from "@/lib/favorites/storage";
 
 export function FavoriteButton({
   slug,
@@ -18,7 +18,14 @@ export function FavoriteButton({
 
   useEffect(() => {
     setMounted(true);
-    setSaved(isFavorite(slug));
+    const update = () => setSaved(isFavorite(slug));
+    update();
+    window.addEventListener(FAVORITES_CHANGED_EVENT, update);
+    window.addEventListener("storage", update);
+    return () => {
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, update);
+      window.removeEventListener("storage", update);
+    };
   }, [slug]);
 
   function onClick(event: React.MouseEvent<HTMLButtonElement>) {
