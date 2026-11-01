@@ -24,7 +24,10 @@
     "tagline": "© {year} {site}. Perfiles gratis, cero comisiones.",
     "findTrainer": "Buscar entrenador",
     "favorites": "Favoritos",
-    "forTrainers": "Para entrenadores"
+    "forTrainers": "Para entrenadores",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "cookies": "Cookies"
   },
   "home": {
     "heroTitle": "Encuentra un entrenador personal cerca de ti",
@@ -195,7 +198,8 @@
     "emailHint": "Te enviaremos un enlace mágico para confirmar — sin contraseña. Nunca se muestra públicamente.",
     "submitting": "Enviando…",
     "createProfile": "Crear mi perfil",
-    "submitReview": "Enviar a revisión"
+    "submitReview": "Enviar a revisión",
+    "consent": "Al crear tu perfil aceptas los <termsLink>Términos del servicio</termsLink> y la <privacyLink>Política de privacidad</privacyLink> (en inglés)."
   },
   "profileForm": {
     "yourName": "Tu nombre",

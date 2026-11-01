@@ -18,6 +18,15 @@ export function SiteFooter() {
           <Link href="/for-trainers" className="hover:text-text">
             {t("forTrainers")}
           </Link>
+          <Link href="/privacy" className="hover:text-text">
+            {t("privacy")}
+          </Link>
+          <Link href="/terms" className="hover:text-text">
+            {t("terms")}
+          </Link>
+          <Link href="/cookies" className="hover:text-text">
+            {t("cookies")}
+          </Link>
         </nav>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { getTaxonomy } from "@/lib/db/queries";
 import { createClient } from "@/lib/supabase/server";
 import { AuthDivider, GoogleAuthButton } from "@/components/auth/google-auth-button";
+import { LegalConsent } from "@/components/legal/legal-consent";
 import { SignupWizard } from "@/components/signup/signup-wizard";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +64,7 @@ export default async function SignupPage({ params, searchParams }: Props) {
       {!user ? (
         <>
           <GoogleAuthButton next="/signup" failurePath="/signup" />
+          <LegalConsent className="mt-3 text-center" />
           <AuthDivider />
         </>
       ) : null}

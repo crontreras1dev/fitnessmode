@@ -17,6 +17,7 @@ import { submitSignup, type SignupResult } from "@/app/[locale]/(auth)/signup/ac
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/form";
+import { LegalConsent } from "@/components/legal/legal-consent";
 import { BasicsFields, LinksFields, ServicesFields } from "./profile-fields";
 import { StepIndicator } from "./step-indicator";
 
@@ -102,12 +103,7 @@ export function SignupWizard({
         <div hidden={step !== 2} className="flex flex-col gap-5">
           <LinksFields form={form} />
           {requireEmail ? (
-            <Field
-              label={ta("email")}
-              htmlFor="email"
-              error={emailError}
-              hint={t("emailHint")}
-            >
+            <Field label={ta("email")} htmlFor="email" error={emailError} hint={t("emailHint")}>
               <Input
                 id="email"
                 type="email"
@@ -125,6 +121,7 @@ export function SignupWizard({
           {result.error}
         </p>
       ) : null}
+      {isLast ? <LegalConsent className="text-center" /> : null}
       <div className="flex items-center justify-between gap-3">
         {step > 0 ? (
           <Button variant="secondary" onClick={() => setStep((current) => current - 1)}>

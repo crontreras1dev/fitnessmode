@@ -24,7 +24,10 @@
     "tagline": "© {year} {site}. Free listings, zero commission.",
     "findTrainer": "Find a trainer",
     "favorites": "Favorites",
-    "forTrainers": "For trainers"
+    "forTrainers": "For trainers",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies"
   },
   "home": {
     "heroTitle": "Find a personal trainer near you",
@@ -195,7 +198,8 @@
     "emailHint": "We'll send a magic link to confirm — no password needed. Never shown publicly.",
     "submitting": "Submitting…",
     "createProfile": "Create my profile",
-    "submitReview": "Submit for review"
+    "submitReview": "Submit for review",
+    "consent": "By creating a profile you agree to the <termsLink>Terms of Service</termsLink> and <privacyLink>Privacy Policy</privacyLink>."
   },
   "profileForm": {
     "yourName": "Your name",
@@ -436,6 +440,25 @@
       "changing-room": "Changing room",
       "equipment-included": "Equipment included",
       "water-station": "Water station"
+    }
+  },
+  "legal": {
+    "contents": "On this page",
+    "lastUpdated": "Last updated: {date}",
+    "privacy": {
+      "title": "Privacy Policy",
+      "metaTitle": "Privacy Policy",
+      "metaDescription": "How FitnessMode collects, uses and protects your data."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "metaTitle": "Terms of Service",
+      "metaDescription": "The rules for using FitnessMode and listing a trainer profile."
+    },
+    "cookies": {
+      "title": "Cookie Notice",
+      "metaTitle": "Cookie Notice",
+      "metaDescription": "How FitnessMode uses cookies and browser storage."
     }
   },
   "notFound": {
