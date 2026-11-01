@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getPathname, Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -30,8 +31,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <>
       <header className="border-border bg-surface border-b">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            Fitness<span className="text-brand">Mode</span>
+          <Link href="/" className="flex shrink-0 items-center">
+            <Image
+              src="/images/logo.png"
+              alt="FitnessMode"
+              width={2172}
+              height={724}
+              className="h-9 w-auto"
+              priority
+            />
           </Link>
           <div className="flex items-center gap-3">
             <form action={signOutAction} method="post">
