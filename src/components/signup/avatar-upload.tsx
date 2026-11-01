@@ -2,7 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { removeAvatar, saveUploadedAvatar } from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
+import {
+  removeAvatar,
+  saveUploadedAvatar,
+} from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

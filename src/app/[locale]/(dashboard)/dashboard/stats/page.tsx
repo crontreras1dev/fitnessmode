@@ -42,11 +42,7 @@ export default async function DashboardStatsPage({ params }: Props) {
 
       <Card>
         <h2 className="font-semibold">{t("dailyViews")}</h2>
-        <div
-          className="mt-4 flex h-40 items-end gap-1"
-          role="img"
-          aria-label={t("chartAria")}
-        >
+        <div className="mt-4 flex h-40 items-end gap-1" role="img" aria-label={t("chartAria")}>
           {stats.daily.map((row) => (
             <div
               key={row.day}

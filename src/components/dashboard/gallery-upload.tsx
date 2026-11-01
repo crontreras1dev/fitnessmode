@@ -2,7 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
-import { removeGalleryPhoto, saveGalleryPhoto } from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
+import {
+  removeGalleryPhoto,
+  saveGalleryPhoto,
+} from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
 import { galleryPhotoUrl } from "@/lib/gallery";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";

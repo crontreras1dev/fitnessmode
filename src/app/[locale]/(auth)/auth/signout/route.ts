@@ -10,8 +10,7 @@ export async function POST(
   const { locale } = await params;
   const supabase = await createClient();
   await supabase.auth.signOut();
-  const home = hasLocale(routing.locales, locale) && locale !== routing.defaultLocale
-    ? `/${locale}`
-    : "/";
+  const home =
+    hasLocale(routing.locales, locale) && locale !== routing.defaultLocale ? `/${locale}` : "/";
   return NextResponse.redirect(new URL(home, request.nextUrl.origin), { status: 303 });
 }

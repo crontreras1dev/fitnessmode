@@ -171,7 +171,10 @@ export async function getSuggestedTrainers(trainer: Trainer, limit = 6): Promise
     if (cityId !== undefined) {
       q = cityId === null ? q.is("city_id", null) : q.eq("city_id", cityId);
     }
-    return q.order("tier", { ascending: false }).order("created_at", { ascending: false }).limit(limit);
+    return q
+      .order("tier", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(limit);
   };
   const run = async (q: ReturnType<typeof query>) => ((await q).data ?? []).map(mapTrainer);
 

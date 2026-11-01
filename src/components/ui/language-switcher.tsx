@@ -39,9 +39,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           onClick={() => switchTo(item)}
           className={cn(
             "rounded-full px-2 py-1 uppercase transition-colors",
-            locale === item
-              ? "bg-brand text-brand-foreground"
-              : "text-text-muted hover:text-text",
+            locale === item ? "bg-brand text-brand-foreground" : "text-text-muted hover:text-text",
           )}
         >
           {item}

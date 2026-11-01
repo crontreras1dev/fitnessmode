@@ -87,7 +87,8 @@ async function buildCtas(trainer: Trainer, t: Translator): Promise<TrainerCta[]>
       const digits = contact.whatsapp.replace(/\D/g, "");
       ctas.unshift({ target: "whatsapp", href: `https://wa.me/${digits}`, label: t("whatsapp") });
     }
-    if (contact?.phone) ctas.push({ target: "phone", href: `tel:${contact.phone}`, label: t("call") });
+    if (contact?.phone)
+      ctas.push({ target: "phone", href: `tel:${contact.phone}`, label: t("call") });
   }
   return ctas;
 }
@@ -141,8 +142,7 @@ export default async function TrainerProfilePage({ params }: Props) {
   const rate = formatRate(trainer.rateMin, trainer.rateMax, trainer.currency, locale);
   const name = (kind: Parameters<typeof termName>[1], term: { slug: string; name: string }) =>
     termName(messages, kind, term);
-  const localizedPath = (path: string) =>
-    getPathname({ href: path, locale: locale as Locale });
+  const localizedPath = (path: string) => getPathname({ href: path, locale: locale as Locale });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
@@ -192,10 +192,7 @@ export default async function TrainerProfilePage({ params }: Props) {
                 size="fluid"
                 shape="square"
               />
-              <FavoriteButton
-                slug={trainer.slug}
-                className="absolute top-2 right-2 shadow-sm"
-              />
+              <FavoriteButton slug={trainer.slug} className="absolute top-2 right-2 shadow-sm" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -310,9 +307,7 @@ export default async function TrainerProfilePage({ params }: Props) {
       {suggestions.length ? (
         <section className="mt-14">
           <h2 className="text-lg font-semibold">
-            {trainer.city
-              ? t("otherTrainersIn", { city: trainer.city.name })
-              : t("otherTrainers")}
+            {trainer.city ? t("otherTrainersIn", { city: trainer.city.name }) : t("otherTrainers")}
           </h2>
           <div className="mt-4">
             <TrainerGrid trainers={suggestions} showCity />

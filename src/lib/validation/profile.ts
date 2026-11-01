@@ -82,15 +82,15 @@ const optionalPhone = (t: ValidationT) =>
     .string()
     .trim()
     .transform((value) => value.replace(/[\s()-]/g, ""))
-    .refine(
-      (value) => value === "" || /^\+?[0-9]{7,15}$/.test(value),
-      t("phoneFormat"),
-    )
+    .refine((value) => value === "" || /^\+?[0-9]{7,15}$/.test(value), t("phoneFormat"))
     .transform((value) => (value === "" ? null : value));
 
 const basicsShape = (t: ValidationT) => ({
   displayName: z.string().trim().min(2, t("enterName")).max(80),
-  cityId: z.number({ error: t("chooseCity") }).int().nonnegative(t("chooseCity")),
+  cityId: z
+    .number({ error: t("chooseCity") })
+    .int()
+    .nonnegative(t("chooseCity")),
   customLocation: z.string().trim().max(120).optional().default(""),
   headline: z.string().trim().max(120).optional().default(""),
   bio: z.string().trim().min(40, t("bioTooShort")).max(1500, t("bioTooLong")),
@@ -153,7 +153,11 @@ export function buildProfileSchema(t: ValidationT) {
 }
 
 export function buildEmailSchema(t: ValidationT) {
-  return z.string().trim().toLowerCase().pipe(z.email(t("validEmail")));
+  return z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.email(t("validEmail")));
 }
 
 // ---------------------------------------------------------------------------

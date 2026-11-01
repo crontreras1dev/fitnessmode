@@ -1,11 +1,7 @@
 import type { AbstractIntlMessages } from "next-intl";
 
 export type TaxonomyKind =
-  | "categories"
-  | "modalities"
-  | "specialties"
-  | "sessionTypes"
-  | "amenities";
+  "categories" | "modalities" | "specialties" | "sessionTypes" | "amenities";
 
 type TaxonomyMessages = { taxonomy?: Record<string, Record<string, string> | undefined> };
 

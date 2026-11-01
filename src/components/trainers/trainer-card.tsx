@@ -43,7 +43,9 @@ export function TrainerCard({
 
       <p className="text-text-muted min-h-[1.25rem] text-sm">
         {trainer.modalities.length
-          ? trainer.modalities.map((modality) => termName(messages, "modalities", modality)).join(" · ")
+          ? trainer.modalities
+              .map((modality) => termName(messages, "modalities", modality))
+              .join(" · ")
           : "\u00A0"}
       </p>
 

@@ -23,7 +23,9 @@ export function FavoritesList() {
       return;
     }
     try {
-      const response = await fetch(`/api/trainers?slugs=${encodeURIComponent(nextSlugs.join(","))}`);
+      const response = await fetch(
+        `/api/trainers?slugs=${encodeURIComponent(nextSlugs.join(","))}`,
+      );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = (await response.json()) as { trainers: Trainer[] };
       setTrainers(data.trainers);
