@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import type { Trainer } from "@/lib/db/queries";
 import { FAVORITES_CHANGED_EVENT, getFavorites } from "@/lib/favorites/storage";
@@ -9,6 +10,7 @@ import { TrainerGrid } from "./trainer-card";
 type Status = "loading" | "ready" | "error";
 
 export function FavoritesList() {
+  const t = useTranslations("favorites");
   const [status, setStatus] = useState<Status>("loading");
   const [trainers, setTrainers] = useState<Trainer[]>([]);
   const [slugs, setSlugs] = useState<string[]>([]);
@@ -69,8 +71,8 @@ export function FavoritesList() {
   if (status === "error") {
     return (
       <div className="rounded-card border-border flex flex-col items-start gap-4 border border-dashed p-8">
-        <h2 className="text-lg font-semibold">Couldn&apos;t load your favorites</h2>
-        <p className="text-text-muted">Check your connection and try again.</p>
+        <h2 className="text-lg font-semibold">{t("loadErrorTitle")}</h2>
+        <p className="text-text-muted">{t("loadErrorBody")}</p>
       </div>
     );
   }
@@ -78,12 +80,9 @@ export function FavoritesList() {
   if (!slugs.length || !trainers.length) {
     return (
       <div className="rounded-card border-border flex flex-col items-start gap-4 border border-dashed p-8">
-        <h2 className="text-lg font-semibold">No favorites yet</h2>
-        <p className="text-text-muted">
-          Tap the heart on any trainer card or profile and they&apos;ll show up here. No account
-          needed — your list is saved on this device.
-        </p>
-        <ButtonLink href="/search">Find a trainer</ButtonLink>
+        <h2 className="text-lg font-semibold">{t("emptyTitle")}</h2>
+        <p className="text-text-muted">{t("emptyBody")}</p>
+        <ButtonLink href="/search">{t("findTrainer")}</ButtonLink>
       </div>
     );
   }

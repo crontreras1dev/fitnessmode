@@ -1,4 +1,5 @@
-import { signInWithGoogle } from "@/app/(auth)/oauth-actions";
+import { useTranslations } from "next-intl";
+import { signInWithGoogle } from "@/app/[locale]/(auth)/oauth-actions";
 import { Button } from "@/components/ui/button";
 
 export function GoogleAuthButton({
@@ -8,6 +9,7 @@ export function GoogleAuthButton({
   next: string;
   failurePath: "/login" | "/signup";
 }) {
+  const t = useTranslations("auth");
   const action = signInWithGoogle.bind(null, next, failurePath);
 
   return (
@@ -31,17 +33,18 @@ export function GoogleAuthButton({
             d="M12 5.99c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.64 9.64 0 0 0 12 2a10 10 0 0 0-8.96 5.51l3.35 2.61C7.18 7.75 9.39 5.99 12 5.99Z"
           />
         </svg>
-        Continue with Google
+        {t("continueWithGoogle")}
       </Button>
     </form>
   );
 }
 
 export function AuthDivider() {
+  const t = useTranslations("auth");
   return (
     <div className="flex items-center gap-3" aria-hidden="true">
       <span className="bg-border h-px flex-1" />
-      <span className="text-text-muted text-xs font-medium uppercase">or</span>
+      <span className="text-text-muted text-xs font-medium uppercase">{t("dividerOr")}</span>
       <span className="bg-border h-px flex-1" />
     </div>
   );

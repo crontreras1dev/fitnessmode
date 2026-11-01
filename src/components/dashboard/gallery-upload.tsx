@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
-import { removeGalleryPhoto, saveGalleryPhoto } from "@/app/(dashboard)/dashboard/profile/actions";
+import { removeGalleryPhoto, saveGalleryPhoto } from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
 import { galleryPhotoUrl } from "@/lib/gallery";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,8 @@ const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export type GalleryPhoto = { id: number; url: string };
 
 export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[] }) {
+  const t = useTranslations("gallery");
+  const te = useTranslations("errors");
   const [supabase] = useState(createClient);
   const [photos, setPhotos] = useState(initialPhotos);
   const [message, setMessage] = useState<{ ok: boolean; text: string }>();
@@ -26,21 +29,21 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        setMessage({ ok: false, text: "Your session expired. Please log in again." });
+        setMessage({ ok: false, text: te("sessionExpired") });
         return;
       }
 
       for (const file of Array.from(files)) {
         if (photos.length >= MAX_PHOTOS) {
-          setMessage({ ok: false, text: `You can add up to ${MAX_PHOTOS} photos.` });
+          setMessage({ ok: false, text: t("tooMany", { max: MAX_PHOTOS }) });
           break;
         }
         if (!PHOTO_TYPES.includes(file.type)) {
-          setMessage({ ok: false, text: "Choose JPEG, PNG, or WebP images." });
+          setMessage({ ok: false, text: t("badType") });
           continue;
         }
         if (file.size > MAX_PHOTO_SIZE) {
-          setMessage({ ok: false, text: `"${file.name}" is larger than 8 MB.` });
+          setMessage({ ok: false, text: t("tooLarge", { name: file.name }) });
           continue;
         }
 
@@ -50,7 +53,7 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
           contentType: file.type,
         });
         if (error) {
-          setMessage({ ok: false, text: "We couldn't upload your photo. Please try again." });
+          setMessage({ ok: false, text: te("savePhoto") });
           continue;
         }
 
@@ -63,7 +66,7 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
           ...current,
           { id: result.photo.id, url: galleryPhotoUrl(result.photo.path) },
         ]);
-        setMessage({ ok: true, text: "Photo added." });
+        setMessage({ ok: true, text: t("added") });
       }
       if (inputRef.current) inputRef.current.value = "";
     });
@@ -77,34 +80,31 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
         return;
       }
       setPhotos((current) => current.filter((item) => item.id !== photo.id));
-      setMessage({ ok: true, text: "Photo removed." });
+      setMessage({ ok: true, text: t("removed") });
     });
   }
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold">Photo gallery</h2>
-      <p className="text-text-muted mt-1 text-sm">
-        Show your space, sessions and results. Up to {MAX_PHOTOS} photos — JPEG, PNG, or WebP, max 8
-        MB each.
-      </p>
+      <h2 className="text-lg font-semibold">{t("title")}</h2>
+      <p className="text-text-muted mt-1 text-sm">{t("subtitle", { max: MAX_PHOTOS })}</p>
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {photos.map((photo) => (
           <div key={photo.id} className="group relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.url}
-              alt="Gallery photo"
+              alt={t("photoAlt")}
               className="border-border aspect-square w-full rounded-xl border object-cover"
             />
             <button
               type="button"
               onClick={() => remove(photo)}
               disabled={pending}
-              aria-label="Remove photo"
+              aria-label={t("removePhoto")}
               className="bg-surface text-danger border-border absolute top-1.5 right-1.5 rounded-xl border px-2 py-0.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
             >
-              Remove
+              {t("remove")}
             </button>
           </div>
         ))}
@@ -115,7 +115,7 @@ export function GalleryUpload({ photos: initialPhotos }: { photos: GalleryPhoto[
             disabled={pending}
             className="border-border text-text-muted hover:border-brand hover:text-brand aspect-square w-full rounded-xl border border-dashed text-sm font-medium transition-colors"
           >
-            {pending ? "Uploading…" : "+ Add photos"}
+            {pending ? t("uploading") : t("addPhotos")}
           </button>
         ) : null}
       </div>

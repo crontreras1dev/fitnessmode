@@ -1,18 +1,21 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import { FAVORITES_CHANGED_EVENT, isFavorite, toggleFavorite } from "@/lib/favorites/storage";
 
 export function FavoriteButton({
   slug,
-  label = "Save trainer",
+  label,
   className,
 }: {
   slug: string;
   label?: string;
   className?: string;
 }) {
+  const t = useTranslations("trainer");
+  const resolvedLabel = label ?? t("saveTrainer");
   const [saved, setSaved] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -39,7 +42,7 @@ export function FavoriteButton({
     <button
       type="button"
       onClick={onClick}
-      aria-label={saved ? `${label} (saved)` : label}
+      aria-label={saved ? t("trainerSaved") : resolvedLabel}
       aria-pressed={saved}
       className={cn(
         "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-xl border transition-colors",

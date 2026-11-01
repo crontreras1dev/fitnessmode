@@ -1,11 +1,16 @@
+import createMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
+import { routing } from "@/i18n/routing";
 import { updateSession } from "@/lib/supabase/middleware";
 
+const intlMiddleware = createMiddleware(routing);
+
 export async function middleware(request: NextRequest) {
-  return updateSession(request);
+  const response = intlMiddleware(request);
+  return updateSession(request, response);
 }
 
-// Only auth-aware routes: public directory pages stay static/ISR and skip the auth round-trip.
+// Locale-aware pages only: API routes, Next internals and files are skipped.
 export const config = {
-  matcher: ["/dashboard/:path*", "/signup", "/login", "/auth/:path*"],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

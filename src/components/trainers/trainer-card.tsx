@@ -1,6 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useMessages, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import { termName } from "@/i18n/terms";
 import type { Trainer } from "@/lib/db/queries";
 import { absoluteUrl, trainerLocationName, trainerProfilePath } from "@/lib/seo/site";
 import { ButtonLink } from "@/components/ui/button";
@@ -15,8 +17,11 @@ export function TrainerCard({
   trainer: Trainer;
   showCity?: boolean;
 }) {
+  const t = useTranslations("trainer");
+  const tc = useTranslations("common");
+  const messages = useMessages();
   const path = trainerProfilePath(trainer);
-  const location = trainerLocationName(trainer);
+  const location = trainerLocationName(trainer, tc("online"));
   const url = absoluteUrl(path);
 
   return (
@@ -31,12 +36,14 @@ export function TrainerCard({
             {trainer.displayName}
           </Link>
         </h3>
-        <p className="text-text-muted text-sm">{showCity ? location : `Trainer in ${location}`}</p>
+        <p className="text-text-muted text-sm">
+          {showCity ? location : t("trainerIn", { location })}
+        </p>
       </div>
 
       <p className="text-text-muted min-h-[1.25rem] text-sm">
         {trainer.modalities.length
-          ? trainer.modalities.map((modality) => modality.name).join(" · ")
+          ? trainer.modalities.map((modality) => termName(messages, "modalities", modality)).join(" · ")
           : "\u00A0"}
       </p>
 
@@ -50,7 +57,7 @@ export function TrainerCard({
           <FavoriteButton slug={trainer.slug} />
         </div>
         <ButtonLink href={path} variant="secondary" size="sm">
-          See Profile
+          {t("seeProfile")}
         </ButtonLink>
       </div>
     </article>

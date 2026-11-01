@@ -1,19 +1,23 @@
 import { z } from "zod";
 
+/** Translator scoped to the "validation" message namespace. */
+export type ValidationT = (key: string, values?: Record<string, string | number>) => string;
+
 export const CURRENCIES = ["USD", "EUR", "GBP", "MXN", "COP", "ARS", "CLP", "PEN"] as const;
 
-const idList = (message: string, max: number) =>
+const idList = (t: ValidationT, message: string, max: number) =>
   z
     .array(z.string())
     .min(1, message)
-    .max(max, `Choose up to ${max}`)
+    .max(max, t("chooseUpTo", { max }))
     .transform((ids) => ids.map(Number).filter((id) => Number.isInteger(id) && id > 0));
 
-const optionalRate = z
-  .string()
-  .trim()
-  .regex(/^\d{0,6}$/, "Use whole numbers only")
-  .transform((value) => (value === "" ? null : Number(value)));
+const optionalRate = (t: ValidationT) =>
+  z
+    .string()
+    .trim()
+    .regex(/^\d{0,6}$/, t("wholeNumbers"))
+    .transform((value) => (value === "" ? null : Number(value)));
 
 const SOCIAL_HOSTS = {
   instagram: "instagram.com",
@@ -42,7 +46,7 @@ export function normalizeSocialUrl(network: keyof typeof SOCIAL_HOSTS, value: st
   }
 }
 
-const socialField = (network: keyof typeof SOCIAL_HOSTS) =>
+const socialField = (t: ValidationT, network: keyof typeof SOCIAL_HOSTS) =>
   z
     .string()
     .trim()
@@ -50,69 +54,67 @@ const socialField = (network: keyof typeof SOCIAL_HOSTS) =>
     .transform((value, ctx) => {
       const normalized = normalizeSocialUrl(network, value);
       if (normalized === undefined) {
-        ctx.addIssue({ code: "custom", message: `Enter your ${network} @handle or profile URL` });
+        ctx.addIssue({ code: "custom", message: t("socialHandle", { network }) });
         return z.NEVER;
       }
       return normalized;
     });
 
-const websiteField = z
-  .string()
-  .trim()
-  .max(300)
-  .transform((value, ctx) => {
-    if (!value) return null;
-    try {
-      const url = new URL(value.startsWith("http") ? value : `https://${value}`);
-      if (!url.hostname.includes(".")) throw new Error("invalid host");
-      return url.toString();
-    } catch {
-      ctx.addIssue({ code: "custom", message: "Enter a valid website URL" });
-      return z.NEVER;
-    }
-  });
-
-const optionalPhone = z
-  .string()
-  .trim()
-  .transform((value) => value.replace(/[\s()-]/g, ""))
-  .refine(
-    (value) => value === "" || /^\+?[0-9]{7,15}$/.test(value),
-    "Use international format, e.g. +34600111222",
-  )
-  .transform((value) => (value === "" ? null : value));
-
-export const basicsShape = {
-  displayName: z.string().trim().min(2, "Enter your name").max(80),
-  cityId: z.number({ error: "Choose your city" }).int().nonnegative("Choose your city"),
-  customLocation: z.string().trim().max(120).optional().default(""),
-  headline: z.string().trim().max(120).optional().default(""),
-  bio: z
+const websiteField = (t: ValidationT) =>
+  z
     .string()
     .trim()
-    .min(40, "Tell clients a bit more (at least 40 characters)")
-    .max(1500, "Keep it under 1500 characters"),
-};
+    .max(300)
+    .transform((value, ctx) => {
+      if (!value) return null;
+      try {
+        const url = new URL(value.startsWith("http") ? value : `https://${value}`);
+        if (!url.hostname.includes(".")) throw new Error("invalid host");
+        return url.toString();
+      } catch {
+        ctx.addIssue({ code: "custom", message: t("websiteUrl") });
+        return z.NEVER;
+      }
+    });
 
-export const servicesShape = {
-  categoryIds: idList("Choose at least one category", 3),
-  modalityIds: idList("Choose at least one modality", 4),
+const optionalPhone = (t: ValidationT) =>
+  z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/[\s()-]/g, ""))
+    .refine(
+      (value) => value === "" || /^\+?[0-9]{7,15}$/.test(value),
+      t("phoneFormat"),
+    )
+    .transform((value) => (value === "" ? null : value));
+
+const basicsShape = (t: ValidationT) => ({
+  displayName: z.string().trim().min(2, t("enterName")).max(80),
+  cityId: z.number({ error: t("chooseCity") }).int().nonnegative(t("chooseCity")),
+  customLocation: z.string().trim().max(120).optional().default(""),
+  headline: z.string().trim().max(120).optional().default(""),
+  bio: z.string().trim().min(40, t("bioTooShort")).max(1500, t("bioTooLong")),
+});
+
+const servicesShape = (t: ValidationT) => ({
+  categoryIds: idList(t, t("chooseCategory"), 3),
+  modalityIds: idList(t, t("chooseModality"), 4),
   specialtyIds: z
     .array(z.string())
-    .max(5, "Choose up to 5")
+    .max(5, t("chooseUpTo", { max: 5 }))
     .transform((ids) => ids.map(Number).filter((id) => Number.isInteger(id) && id > 0)),
-  rateMin: optionalRate,
-  rateMax: optionalRate,
+  rateMin: optionalRate(t),
+  rateMax: optionalRate(t),
   currency: z.enum(CURRENCIES),
-};
+});
 
-export const linksShape = {
-  instagramUrl: socialField("instagram"),
-  tiktokUrl: socialField("tiktok"),
-  websiteUrl: websiteField,
-  whatsapp: optionalPhone,
-  phone: optionalPhone,
-};
+const linksShape = (t: ValidationT) => ({
+  instagramUrl: socialField(t, "instagram"),
+  tiktokUrl: socialField(t, "tiktok"),
+  websiteUrl: websiteField(t),
+  whatsapp: optionalPhone(t),
+  phone: optionalPhone(t),
+});
 
 type RefineInput = {
   cityId: number;
@@ -124,81 +126,86 @@ type RefineInput = {
   websiteUrl: string | null;
 };
 
-function refineProfile(data: RefineInput, ctx: z.RefinementCtx) {
+function refineProfile(t: ValidationT, data: RefineInput, ctx: z.RefinementCtx) {
   if (data.cityId <= 0 && data.customLocation.length < 2) {
     ctx.addIssue({
       code: "custom",
       path: ["cityId"],
-      message: "Choose your city, or tap below to enter your town or area",
+      message: t("chooseCityOrCustom"),
     });
   }
   if (data.rateMin !== null && data.rateMax !== null && data.rateMin > data.rateMax) {
-    ctx.addIssue({ code: "custom", path: ["rateMax"], message: "Max rate must be ≥ min rate" });
+    ctx.addIssue({ code: "custom", path: ["rateMax"], message: t("rateOrder") });
   }
   if (!data.instagramUrl && !data.tiktokUrl && !data.websiteUrl) {
     ctx.addIssue({
       code: "custom",
       path: ["instagramUrl"],
-      message: "Add at least one link so clients can see your work",
+      message: t("needOneLink"),
     });
   }
 }
 
-export const profileSchema = z
-  .object({ ...basicsShape, ...servicesShape, ...linksShape })
-  .superRefine(refineProfile);
+export function buildProfileSchema(t: ValidationT) {
+  return z
+    .object({ ...basicsShape(t), ...servicesShape(t), ...linksShape(t) })
+    .superRefine((data, ctx) => refineProfile(t, data, ctx));
+}
 
-export const emailSchema = z.string().trim().toLowerCase().pipe(z.email("Enter a valid email"));
+export function buildEmailSchema(t: ValidationT) {
+  return z.string().trim().toLowerCase().pipe(z.email(t("validEmail")));
+}
 
 // ---------------------------------------------------------------------------
 // Dashboard-only details (not part of the signup wizard)
 // ---------------------------------------------------------------------------
 
-const optionalIdList = (max: number) =>
+const optionalIdList = (t: ValidationT, max: number) =>
   z
     .array(z.string())
-    .max(max, `Choose up to ${max}`)
+    .max(max, t("chooseUpTo", { max }))
     .transform((ids) => ids.map(Number).filter((id) => Number.isInteger(id) && id > 0));
 
-const educationEntrySchema = z.object({
-  degree: z.string().trim().min(2, "Enter a degree or certification").max(120),
-  institution: z.string().trim().max(120).optional().default(""),
-  year: z
-    .string()
-    .trim()
-    .regex(/^(\d{4})?$/, "Use a 4-digit year")
-    .transform((value) => (value === "" ? null : Number(value)))
-    .refine(
-      (value) => value === null || (value >= 1950 && value <= new Date().getFullYear()),
-      "Enter a valid year",
-    ),
-});
+const educationEntrySchema = (t: ValidationT) =>
+  z.object({
+    degree: z.string().trim().min(2, t("degree")).max(120),
+    institution: z.string().trim().max(120).optional().default(""),
+    year: z
+      .string()
+      .trim()
+      .regex(/^(\d{4})?$/, t("fourDigitYear"))
+      .transform((value) => (value === "" ? null : Number(value)))
+      .refine(
+        (value) => value === null || (value >= 1950 && value <= new Date().getFullYear()),
+        t("validYear"),
+      ),
+  });
 
-export const detailsShape = {
-  sessionTypeIds: optionalIdList(4),
-  amenityIds: optionalIdList(12),
-  languages: z
-    .array(z.string().trim().min(1).max(40, "Keep each language under 40 characters"))
-    .max(10, "Add up to 10 languages")
-    .transform((values) => {
-      const seen = new Set<string>();
-      return values
-        .map((value) => value.replace(/\s+/g, " "))
-        .filter((value) => {
-          const key = value.toLowerCase();
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-    }),
-  education: z.array(educationEntrySchema).max(12, "Add up to 12 entries"),
-};
+export function buildDetailsSchema(t: ValidationT) {
+  return z.object({
+    sessionTypeIds: optionalIdList(t, 4),
+    amenityIds: optionalIdList(t, 12),
+    languages: z
+      .array(z.string().trim().min(1).max(40, t("languageTooLong")))
+      .max(10, t("tooManyLanguages"))
+      .transform((values) => {
+        const seen = new Set<string>();
+        return values
+          .map((value) => value.replace(/\s+/g, " "))
+          .filter((value) => {
+            const key = value.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+      }),
+    education: z.array(educationEntrySchema(t)).max(12, t("tooManyEducation")),
+  });
+}
 
-export const detailsSchema = z.object(detailsShape);
-
-export type DetailsFormInput = z.input<typeof detailsSchema>;
-export type DetailsFormValues = z.output<typeof detailsSchema>;
-export type EducationEntry = z.output<typeof educationEntrySchema>;
+export type DetailsFormInput = z.input<ReturnType<typeof buildDetailsSchema>>;
+export type DetailsFormValues = z.output<ReturnType<typeof buildDetailsSchema>>;
+export type EducationEntry = z.output<ReturnType<typeof educationEntrySchema>>;
 
 export const emptyDetailsInput: DetailsFormInput = {
   sessionTypeIds: [],
@@ -207,20 +214,26 @@ export const emptyDetailsInput: DetailsFormInput = {
   education: [],
 };
 
-export type ProfileFormInput = z.input<typeof profileSchema>;
-export type ProfileFormValues = z.output<typeof profileSchema>;
+export type ProfileFormInput = z.input<ReturnType<typeof buildProfileSchema>>;
+export type ProfileFormValues = z.output<ReturnType<typeof buildProfileSchema>>;
 
 export const SIGNUP_STEPS = [
   {
-    title: "About you",
+    titleKey: "step1",
     fields: ["displayName", "cityId", "customLocation", "headline", "bio"],
   },
   {
-    title: "Your services",
+    titleKey: "step2",
     fields: ["categoryIds", "modalityIds", "specialtyIds", "rateMin", "rateMax", "currency"],
   },
-  { title: "Your links", fields: ["instagramUrl", "tiktokUrl", "websiteUrl", "whatsapp", "phone"] },
-] as const satisfies readonly { title: string; fields: readonly (keyof ProfileFormInput)[] }[];
+  {
+    titleKey: "step3",
+    fields: ["instagramUrl", "tiktokUrl", "websiteUrl", "whatsapp", "phone"],
+  },
+] as const satisfies readonly {
+  titleKey: string;
+  fields: readonly (keyof ProfileFormInput)[];
+}[];
 
 export const emptyProfileInput: ProfileFormInput = {
   displayName: "",

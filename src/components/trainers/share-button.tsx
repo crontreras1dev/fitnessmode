@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { cn } from "@/components/ui/cn";
 
@@ -12,6 +13,7 @@ export function ShareButton({
   title?: string;
   className?: string;
 }) {
+  const t = useTranslations("trainer");
   const [copied, setCopied] = useState(false);
 
   async function onClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -40,7 +42,7 @@ export function ShareButton({
     <button
       type="button"
       onClick={onClick}
-      aria-label={copied ? "Link copied" : "Share trainer profile"}
+      aria-label={copied ? t("linkCopied") : t("shareProfile")}
       className={cn(
         "border-border bg-surface text-text hover:bg-surface-muted inline-flex size-9 items-center justify-center rounded-xl border transition-colors",
         className,

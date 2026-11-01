@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/components/ui/cn";
 import { Input } from "@/components/ui/form";
@@ -28,11 +29,12 @@ export function CityAutocomplete({
   id,
   value,
   onChange,
-  placeholder = "City",
+  placeholder,
   invalid,
   className,
   inputClassName,
 }: Props) {
+  const t = useTranslations("cityAutocomplete");
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const listId = `${inputId}-listbox`;
@@ -85,7 +87,7 @@ export function CityAutocomplete({
         aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
         aria-invalid={invalid || undefined}
         autoComplete="off"
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("placeholder")}
         value={query}
         className={inputClassName}
         onFocus={() => setOpen(true)}
@@ -144,7 +146,7 @@ export function CityAutocomplete({
                 </span>
               </span>
               {city.nearest ? (
-                <span className="text-text-muted text-xs">Nearest listed city</span>
+                <span className="text-text-muted text-xs">{t("nearest")}</span>
               ) : null}
             </li>
           ))}

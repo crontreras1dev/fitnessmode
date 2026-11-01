@@ -1,9 +1,16 @@
-export function formatRate(min: number | null, max: number | null, currency: string) {
+export function formatRate(
+  min: number | null,
+  max: number | null,
+  currency: string,
+  locale = "en",
+) {
   if (min === null && max === null) return null;
   const format = (value: number) =>
-    new Intl.NumberFormat("en", { style: "currency", currency, maximumFractionDigits: 0 }).format(
-      value,
-    );
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(value);
   if (min !== null && max !== null && min !== max) return `${format(min)}–${format(max)}`;
   return format((min ?? max) as number);
 }

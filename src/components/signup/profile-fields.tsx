@@ -1,7 +1,9 @@
 "use client";
 
+import { useMessages, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
+import { termName } from "@/i18n/terms";
 import type { Taxonomy } from "@/lib/db/queries";
 import {
   CURRENCIES,
@@ -28,6 +30,7 @@ export function BasicsFields({
   form: ProfileForm;
   initialCity?: CitySuggestion | null;
 }) {
+  const t = useTranslations("profileForm");
   const [city, setCity] = useState<CitySuggestion | null>(initialCity ?? null);
   const [customMode, setCustomMode] = useState(
     () => !initialCity && Boolean(form.getValues("customLocation")),
@@ -40,7 +43,7 @@ export function BasicsFields({
   const bio = errorProps(form, "bio");
   return (
     <div className="flex flex-col gap-5">
-      <Field label="Your name" htmlFor="displayName" error={name.error}>
+      <Field label={t("yourName")} htmlFor="displayName" error={name.error}>
         <Input
           id="displayName"
           autoComplete="name"
@@ -49,15 +52,15 @@ export function BasicsFields({
         />
       </Field>
       <Field
-        label="City"
+        label={t("city")}
         htmlFor={customMode ? "customLocation" : "cityId"}
         error={locationError}
-        hint="Where you train clients in person (or where you're based if you coach online)."
+        hint={t("cityHint")}
       >
         {customMode ? (
           <Input
             id="customLocation"
-            placeholder="e.g. Santa Fe, NM — or Online only"
+            placeholder={t("customLocationPlaceholder")}
             maxLength={120}
             aria-invalid={cityError.invalid || customLocation.invalid || undefined}
             {...form.register("customLocation")}
@@ -71,7 +74,7 @@ export function BasicsFields({
                 id="cityId"
                 value={city}
                 invalid={cityError.invalid}
-                placeholder="Start typing your city"
+                placeholder={t("cityPlaceholder")}
                 onChange={(next) => {
                   setCity(next);
                   field.onChange(next?.id ?? 0);
@@ -93,23 +96,18 @@ export function BasicsFields({
             setCustomMode(!customMode);
           }}
         >
-          {customMode ? "Choose from listed cities" : "My city isn't listed"}
+          {customMode ? t("chooseListedCity") : t("cityNotListed")}
         </button>
       </Field>
       <Field
-        label="Headline (optional)"
+        label={t("headline")}
         htmlFor="headline"
         error={headline.error}
-        hint="e.g. Strength coach for busy professionals"
+        hint={t("headlineHint")}
       >
         <Input id="headline" maxLength={120} {...form.register("headline")} />
       </Field>
-      <Field
-        label="Bio"
-        htmlFor="bio"
-        error={bio.error}
-        hint="Your experience, certifications and how you work."
-      >
+      <Field label={t("bio")} htmlFor="bio" error={bio.error} hint={t("bioHint")}>
         <Textarea
           id="bio"
           maxLength={1500}
@@ -126,12 +124,15 @@ function ChoiceGroup({
   name,
   legend,
   options,
+  kind,
 }: {
   form: ProfileForm;
   name: "categoryIds" | "modalityIds" | "specialtyIds";
   legend: string;
   options: Taxonomy["categories"];
+  kind: "categories" | "modalities" | "specialties";
 }) {
+  const messages = useMessages();
   const message = form.formState.errors[name]?.message;
   return (
     <fieldset className="flex flex-col gap-2">
@@ -140,7 +141,7 @@ function ChoiceGroup({
         {options.map((option) => (
           <ChoiceChip
             key={option.id}
-            label={option.name}
+            label={termName(messages, kind, option)}
             value={String(option.id)}
             {...form.register(name)}
           />
@@ -152,6 +153,7 @@ function ChoiceGroup({
 }
 
 export function ServicesFields({ form, taxonomy }: { form: ProfileForm; taxonomy: Taxonomy }) {
+  const t = useTranslations("profileForm");
   const rateMin = errorProps(form, "rateMin");
   const rateMax = errorProps(form, "rateMax");
   return (
@@ -159,39 +161,42 @@ export function ServicesFields({ form, taxonomy }: { form: ProfileForm; taxonomy
       <ChoiceGroup
         form={form}
         name="categoryIds"
-        legend="What kind of trainer are you?"
+        legend={t("categoryLegend")}
         options={taxonomy.categories}
+        kind="categories"
       />
       <ChoiceGroup
         form={form}
         name="modalityIds"
-        legend="Where do you train clients?"
+        legend={t("modalityLegend")}
         options={taxonomy.modalities}
+        kind="modalities"
       />
       <ChoiceGroup
         form={form}
         name="specialtyIds"
-        legend="Specialties (up to 5)"
+        legend={t("specialtyLegend")}
         options={taxonomy.specialties}
+        kind="specialties"
       />
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">Rate per session (optional)</legend>
+        <legend className="text-sm font-medium">{t("rateLegend")}</legend>
         <div className="mt-2 grid grid-cols-[1fr_1fr_7rem] gap-2">
           <Input
-            aria-label="Minimum rate"
-            placeholder="Min"
+            aria-label={t("minRate")}
+            placeholder={t("min")}
             inputMode="numeric"
             aria-invalid={rateMin.invalid || undefined}
             {...form.register("rateMin")}
           />
           <Input
-            aria-label="Maximum rate"
-            placeholder="Max"
+            aria-label={t("maxRate")}
+            placeholder={t("max")}
             inputMode="numeric"
             aria-invalid={rateMax.invalid || undefined}
             {...form.register("rateMax")}
           />
-          <Select aria-label="Currency" {...form.register("currency")}>
+          <Select aria-label={t("currency")} {...form.register("currency")}>
             {CURRENCIES.map((currency) => (
               <option key={currency}>{currency}</option>
             ))}
@@ -204,6 +209,7 @@ export function ServicesFields({ form, taxonomy }: { form: ProfileForm; taxonomy
 }
 
 export function LinksFields({ form }: { form: ProfileForm }) {
+  const t = useTranslations("profileForm");
   const instagram = errorProps(form, "instagramUrl");
   const tiktok = errorProps(form, "tiktokUrl");
   const website = errorProps(form, "websiteUrl");
@@ -211,44 +217,39 @@ export function LinksFields({ form }: { form: ProfileForm }) {
   const phone = errorProps(form, "phone");
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-text-muted text-sm">
-        Clients check your real work before reaching out. Add at least one link.
-      </p>
+      <p className="text-text-muted text-sm">{t("linksIntro")}</p>
       <Field
         label="Instagram"
         htmlFor="instagramUrl"
         error={instagram.error}
-        hint="@handle or profile URL"
+        hint={t("handleHint")}
       >
         <Input
           id="instagramUrl"
-          placeholder="@yourhandle"
+          placeholder={t("handlePlaceholder")}
           aria-invalid={instagram.invalid || undefined}
           {...form.register("instagramUrl")}
         />
       </Field>
-      <Field label="TikTok" htmlFor="tiktokUrl" error={tiktok.error} hint="@handle or profile URL">
+      <Field label="TikTok" htmlFor="tiktokUrl" error={tiktok.error} hint={t("handleHint")}>
         <Input
           id="tiktokUrl"
-          placeholder="@yourhandle"
+          placeholder={t("handlePlaceholder")}
           aria-invalid={tiktok.invalid || undefined}
           {...form.register("tiktokUrl")}
         />
       </Field>
-      <Field label="Website" htmlFor="websiteUrl" error={website.error}>
+      <Field label={t("website")} htmlFor="websiteUrl" error={website.error}>
         <Input
           id="websiteUrl"
-          placeholder="yoursite.com"
+          placeholder={t("websitePlaceholder")}
           aria-invalid={website.invalid || undefined}
           {...form.register("websiteUrl")}
         />
       </Field>
       <div className="rounded-card border-border grid gap-5 border border-dashed p-4 sm:grid-cols-2">
-        <p className="text-text-muted text-sm sm:col-span-2">
-          Direct WhatsApp &amp; Call buttons are a Pro feature. Add them now and they&apos;ll go
-          live when you upgrade — they stay private until then.
-        </p>
-        <Field label="WhatsApp (optional)" htmlFor="whatsapp" error={whatsapp.error}>
+        <p className="text-text-muted text-sm sm:col-span-2">{t("proContactNote")}</p>
+        <Field label={t("whatsapp")} htmlFor="whatsapp" error={whatsapp.error}>
           <Input
             id="whatsapp"
             type="tel"
@@ -257,7 +258,7 @@ export function LinksFields({ form }: { form: ProfileForm }) {
             {...form.register("whatsapp")}
           />
         </Field>
-        <Field label="Phone (optional)" htmlFor="phone" error={phone.error}>
+        <Field label={t("phone")} htmlFor="phone" error={phone.error}>
           <Input
             id="phone"
             type="tel"

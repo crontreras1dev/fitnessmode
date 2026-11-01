@@ -1,22 +1,22 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/lib/seo/site";
 
 export function SiteFooter() {
+  const t = useTranslations("footer");
   return (
     <footer className="border-border mt-auto border-t">
       <div className="text-text-muted mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p>
-          © {new Date().getFullYear()} {siteConfig.name}. Free listings, zero commission.
-        </p>
+        <p>{t("tagline", { year: new Date().getFullYear(), site: siteConfig.name })}</p>
         <nav className="flex gap-4">
           <Link href="/search" className="hover:text-text">
-            Find a trainer
+            {t("findTrainer")}
           </Link>
           <Link href="/favorites" className="hover:text-text">
-            Favorites
+            {t("favorites")}
           </Link>
           <Link href="/for-trainers" className="hover:text-text">
-            For trainers
+            {t("forTrainers")}
           </Link>
         </nav>
       </div>

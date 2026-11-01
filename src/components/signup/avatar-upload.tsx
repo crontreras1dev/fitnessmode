@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { removeAvatar, saveUploadedAvatar } from "@/app/(dashboard)/dashboard/profile/actions";
+import { removeAvatar, saveUploadedAvatar } from "@/app/[locale]/(dashboard)/dashboard/profile/actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,8 @@ const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
+  const t = useTranslations("avatar");
+  const te = useTranslations("errors");
   const [supabase] = useState(createClient);
   const [currentUrl, setCurrentUrl] = useState(avatarUrl);
   const [file, setFile] = useState<File>();
@@ -36,11 +39,11 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
       return;
     }
     if (!AVATAR_TYPES.includes(selected.type)) {
-      setMessage({ ok: false, text: "Choose a JPEG, PNG, or WebP image." });
+      setMessage({ ok: false, text: t("badType") });
       return;
     }
     if (selected.size > MAX_AVATAR_SIZE) {
-      setMessage({ ok: false, text: "Choose an image smaller than 5 MB." });
+      setMessage({ ok: false, text: t("tooLarge") });
       return;
     }
     setFile(selected);
@@ -53,7 +56,7 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        setMessage({ ok: false, text: "Your session expired. Please log in again." });
+        setMessage({ ok: false, text: te("sessionExpired") });
         return;
       }
 
@@ -63,7 +66,7 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
         upsert: true,
       });
       if (error) {
-        setMessage({ ok: false, text: "We couldn't upload your photo. Please try again." });
+        setMessage({ ok: false, text: te("savePhoto") });
         return;
       }
 
@@ -75,7 +78,7 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
       setCurrentUrl(result.avatarUrl);
       setFile(undefined);
       if (inputRef.current) inputRef.current.value = "";
-      setMessage({ ok: true, text: "Profile photo updated." });
+      setMessage({ ok: true, text: t("updated") });
     });
   }
 
@@ -89,18 +92,18 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
       setCurrentUrl(null);
       setFile(undefined);
       if (inputRef.current) inputRef.current.value = "";
-      setMessage({ ok: true, text: "Profile photo removed." });
+      setMessage({ ok: true, text: t("removed") });
     });
   }
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold">Profile photo</h2>
+      <h2 className="text-lg font-semibold">{t("title")}</h2>
       <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center">
         <TrainerAvatar name={name} avatarUrl={previewUrl ?? currentUrl} size="lg" />
         <div className="flex flex-1 flex-col gap-3">
           <div>
-            <label className="text-sm font-medium">Choose a photo</label>
+            <label className="text-sm font-medium">{t("choosePhoto")}</label>
             <input
               ref={inputRef}
               id="avatar"
@@ -117,21 +120,21 @@ export function AvatarUpload({ name, avatarUrl }: { name: string; avatarUrl: str
                 onClick={() => inputRef.current?.click()}
                 disabled={pending}
               >
-                Select file
+                {t("selectFile")}
               </Button>
               <span className="text-text-muted truncate text-sm" aria-live="polite">
-                {file ? file.name : "No file selected"}
+                {file ? file.name : t("noFile")}
               </span>
             </div>
-            <p className="text-text-muted mt-1.5 text-xs">JPEG, PNG, or WebP. Maximum 5 MB.</p>
+            <p className="text-text-muted mt-1.5 text-xs">{t("requirements")}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={upload} disabled={pending || !file}>
-              {pending && file ? "Uploading…" : "Upload photo"}
+              {pending && file ? t("uploading") : t("upload")}
             </Button>
             {currentUrl ? (
               <Button variant="secondary" onClick={remove} disabled={pending}>
-                Remove photo
+                {t("remove")}
               </Button>
             ) : null}
           </div>

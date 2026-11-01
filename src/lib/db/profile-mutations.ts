@@ -1,7 +1,9 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getTranslations } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 import type { DetailsFormValues, ProfileFormValues } from "@/lib/validation/profile";
-import { profileSchema } from "@/lib/validation/profile";
+import { buildProfileSchema } from "@/lib/validation/profile";
 import { slugify } from "@/lib/seo/slug";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "./types";
@@ -156,7 +158,9 @@ export async function finalizePendingProfile(client: Client) {
 
   let result: "exists" | "created" | "missing" = existing ? "exists" : "missing";
   if (!existing && pending) {
-    const parsed = profileSchema.safeParse(pending);
+    // Errors are only logged, so the default locale is enough here.
+    const tv = await getTranslations({ locale: routing.defaultLocale, namespace: "validation" });
+    const parsed = buildProfileSchema(tv).safeParse(pending);
     if (parsed.success) {
       await createProfile(client, user.id, parsed.data);
       result = "created";

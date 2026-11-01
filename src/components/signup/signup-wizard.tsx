@@ -1,18 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
+import { useMemo, useState, useTransition } from "react";
 import { useForm, type FieldErrors } from "react-hook-form";
 import type { Taxonomy } from "@/lib/db/queries";
 import {
-  emailSchema,
+  buildEmailSchema,
+  buildProfileSchema,
   emptyProfileInput,
-  profileSchema,
   SIGNUP_STEPS,
   type ProfileFormInput,
   type ProfileFormValues,
 } from "@/lib/validation/profile";
-import { submitSignup, type SignupResult } from "@/app/(auth)/signup/actions";
+import { submitSignup, type SignupResult } from "@/app/[locale]/(auth)/signup/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field, Input } from "@/components/ui/form";
@@ -26,17 +27,24 @@ export function SignupWizard({
   taxonomy: Taxonomy;
   requireEmail: boolean;
 }) {
+  const t = useTranslations("signup");
+  const tc = useTranslations("common");
+  const ta = useTranslations("auth");
+  const tv = useTranslations("validation");
+  const schema = useMemo(() => buildProfileSchema(tv), [tv]);
+  const emailCheck = useMemo(() => buildEmailSchema(tv), [tv]);
   const [step, setStep] = useState(0);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string>();
   const [result, setResult] = useState<SignupResult | null>(null);
   const [pending, startTransition] = useTransition();
   const form = useForm<ProfileFormInput, unknown, ProfileFormValues>({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(schema),
     defaultValues: emptyProfileInput,
     mode: "onTouched",
   });
   const isLast = step === SIGNUP_STEPS.length - 1;
+  const stepTitles = SIGNUP_STEPS.map((item) => t(item.titleKey));
 
   async function next() {
     const valid = await form.trigger([...SIGNUP_STEPS[step].fields], { shouldFocus: true });
@@ -53,7 +61,7 @@ export function SignupWizard({
 
   const onSubmit = form.handleSubmit(() => {
     if (requireEmail) {
-      const parsed = emailSchema.safeParse(email);
+      const parsed = emailCheck.safeParse(email);
       if (!parsed.success) {
         setEmailError(parsed.error.issues[0]?.message);
         return;
@@ -70,10 +78,12 @@ export function SignupWizard({
   if (result?.ok) {
     return (
       <Card role="status" className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold">Check your inbox</h2>
+        <h2 className="text-xl font-semibold">{t("checkInbox")}</h2>
         <p className="text-text-muted">
-          We sent a confirmation link to <strong className="text-text">{result.email}</strong>. Open
-          it to publish your profile for review — it usually goes live within 24 hours.
+          {t.rich("sentConfirmation", {
+            email: result.email,
+            strong: (chunks) => <strong className="text-text">{chunks}</strong>,
+          })}
         </p>
       </Card>
     );
@@ -81,7 +91,7 @@ export function SignupWizard({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
-      <StepIndicator steps={SIGNUP_STEPS.map((item) => item.title)} current={step} />
+      <StepIndicator steps={stepTitles} current={step} />
       <Card>
         <div hidden={step !== 0}>
           <BasicsFields form={form} />
@@ -93,10 +103,10 @@ export function SignupWizard({
           <LinksFields form={form} />
           {requireEmail ? (
             <Field
-              label="Email"
+              label={ta("email")}
               htmlFor="email"
               error={emailError}
-              hint="We'll send a magic link to confirm — no password needed. Never shown publicly."
+              hint={t("emailHint")}
             >
               <Input
                 id="email"
@@ -118,18 +128,18 @@ export function SignupWizard({
       <div className="flex items-center justify-between gap-3">
         {step > 0 ? (
           <Button variant="secondary" onClick={() => setStep((current) => current - 1)}>
-            Back
+            {tc("back")}
           </Button>
         ) : (
           <span />
         )}
         {isLast ? (
           <Button type="submit" size="lg" disabled={pending}>
-            {pending ? "Submitting…" : requireEmail ? "Create my profile" : "Submit for review"}
+            {pending ? t("submitting") : requireEmail ? t("createProfile") : t("submitReview")}
           </Button>
         ) : (
           <Button size="lg" onClick={next}>
-            Continue
+            {tc("continue")}
           </Button>
         )}
       </div>

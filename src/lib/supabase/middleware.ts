@@ -1,13 +1,30 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { hasLocale } from "next-intl";
+import { routing } from "@/i18n/routing";
 import type { Database } from "@/lib/db/types";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./env";
 
 const PROTECTED_PREFIXES = ["/dashboard"];
 
-/** Refreshes the Supabase session cookie and guards dashboard routes. */
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+/** Path without a leading /en or /es segment. */
+function pathnameWithoutLocale(pathname: string) {
+  const segment = pathname.split("/")[1] ?? "";
+  return hasLocale(routing.locales, segment) ? pathname.slice(segment.length + 1) || "/" : pathname;
+}
+
+/** Path prefixed for the locale found in the pathname (default locale stays bare). */
+function localizePath(pathname: string, target: string) {
+  const segment = pathname.split("/")[1] ?? "";
+  const locale = hasLocale(routing.locales, segment) ? segment : routing.defaultLocale;
+  return locale === routing.defaultLocale ? target : `/${locale}${target}`;
+}
+
+/**
+ * Refreshes the Supabase session cookie (writing onto the response produced by
+ * the intl middleware) and guards dashboard routes.
+ */
+export async function updateSession(request: NextRequest, response: NextResponse) {
   if (!isSupabaseConfigured) return response;
 
   const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -17,7 +34,20 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        if (response.headers.get("location")) {
+          // Redirect responses only need the refreshed cookies for the browser.
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options),
+          );
+          return;
+        }
+        // Rebuild the response so refreshed request cookies reach downstream
+        // code, while preserving what the intl middleware already decided
+        // (locale rewrite, request headers, locale cookie).
+        const next = NextResponse.next({ request });
+        response.headers.forEach((value, key) => next.headers.set(key, value));
+        next.headers.set("x-middleware-request-cookie", request.headers.get("cookie") ?? "");
+        response = next;
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );
@@ -32,9 +62,10 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname, search } = request.nextUrl;
-  if (!user && PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+  const barePath = pathnameWithoutLocale(pathname);
+  if (!user && PROTECTED_PREFIXES.some((prefix) => barePath.startsWith(prefix))) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = localizePath(pathname, "/login");
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
     return NextResponse.redirect(url);
   }

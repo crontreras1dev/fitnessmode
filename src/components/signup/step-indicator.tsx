@@ -1,8 +1,10 @@
+import { useTranslations } from "next-intl";
 import { cn } from "@/components/ui/cn";
 
 export function StepIndicator({ steps, current }: { steps: string[]; current: number }) {
+  const t = useTranslations("signup");
   return (
-    <ol className="grid grid-cols-3 gap-2" aria-label="Signup progress">
+    <ol className="grid grid-cols-3 gap-2" aria-label={t("progress")}>
       {steps.map((title, index) => (
         <li
           key={title}
