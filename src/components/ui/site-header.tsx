@@ -114,7 +114,6 @@ export function SiteHeader() {
           <LanguageSwitcher />
         </nav>
         <div className="-mr-2 flex items-center gap-1 sm:hidden">
-          <LanguageSwitcher />
           <button
             type="button"
             className="text-text hover:bg-surface-muted rounded-lg p-2"
@@ -179,6 +178,10 @@ export function SiteHeader() {
               </ButtonLink>
             </>
           ) : null}
+          <div className="border-border my-1 border-t" />
+          <div className="px-3 py-2">
+            <LanguageSwitcher />
+          </div>
         </div>
       </nav>
     </header>
