@@ -11,6 +11,7 @@ import {
   type OwnProfile,
 } from "@/lib/db/profile-mutations";
 import { trainerProfilePath } from "@/lib/seo/site";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
   buildDetailsSchema,
@@ -229,6 +230,23 @@ export async function deleteProfile(confirmation: string): Promise<{ ok: false; 
 
   const { error } = await supabase.from("profiles").delete().eq("id", user.id);
   if (error) return { ok: false, error: t("deleteProfile") };
+
+  // The auth.users row must go too: otherwise a returning user's login OTP
+  // verifies fine but /auth/callback finds no profile and no pending signup.
+  // A missing service-role key or failed call leaves an orphan — ops issue,
+  // not a user-facing error, since the profile is already gone.
+  const admin = createAdminClient();
+  if (!admin) {
+    console.error("deleteProfile: no service-role key; auth user orphaned", { userId: user.id });
+  } else {
+    const { error: adminError } = await admin.auth.admin.deleteUser(user.id);
+    if (adminError) {
+      console.error("deleteProfile: auth user deletion failed", {
+        userId: user.id,
+        error: adminError,
+      });
+    }
+  }
 
   revalidateProfilePages(profile);
   await supabase.auth.signOut();

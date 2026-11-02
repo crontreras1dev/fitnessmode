@@ -44,7 +44,11 @@ export async function GET(request: NextRequest) {
   try {
     const result = await finalizePendingProfile(supabase);
     if (result === "missing") {
-      console.error("auth callback: no pending profile found for verified user");
+      // Verified but no profile and nothing pending — the normal landing for a
+      // first OAuth sign-in. The wizard handles a signed-in user; it's not an error.
+      return NextResponse.redirect(new URL("/signup", origin));
+    }
+    if (result === "invalid") {
       return NextResponse.redirect(new URL("/signup?error=profile", origin));
     }
     if (result === "created") return NextResponse.redirect(new URL("/dashboard?welcome=1", origin));

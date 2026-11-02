@@ -156,7 +156,7 @@ export async function finalizePendingProfile(client: Client) {
     }
   }
 
-  let result: "exists" | "created" | "missing" = existing ? "exists" : "missing";
+  let result: "exists" | "created" | "missing" | "invalid" = existing ? "exists" : "missing";
   if (!existing && pending) {
     // Errors are only logged, so the default locale is enough here.
     const tv = await getTranslations({ locale: routing.defaultLocale, namespace: "validation" });
@@ -166,6 +166,7 @@ export async function finalizePendingProfile(client: Client) {
       result = "created";
     } else {
       console.error("pending profile failed validation", parsed.error.flatten());
+      result = "invalid";
     }
   }
   if (user.user_metadata?.pending_profile) {
