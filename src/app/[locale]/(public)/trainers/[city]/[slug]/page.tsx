@@ -307,7 +307,7 @@ export default async function TrainerProfilePage({ params }: Props) {
       {suggestions.length ? (
         <section className="mt-14">
           <h2 className="text-lg font-semibold">
-            {trainer.city ? t("otherTrainersIn", { city: trainer.city.name }) : t("otherTrainers")}
+            {t("otherTrainers")}
           </h2>
           <div className="mt-4">
             <TrainerGrid trainers={suggestions} showCity />
