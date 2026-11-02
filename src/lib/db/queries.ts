@@ -1,7 +1,9 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { createPublicClient } from "@/lib/supabase/public";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { SearchFilters } from "@/lib/validation/search";
 import type { EducationEntry } from "@/lib/validation/profile";
 import { galleryPhotoUrl } from "@/lib/gallery";
@@ -81,47 +83,88 @@ function trainerQuery(client: Client) {
 type TrainerRow = NonNullable<Awaited<ReturnType<typeof trainerQuery>>["data"]>[number];
 export type Trainer = ReturnType<typeof mapTrainer>;
 
-export async function getTaxonomy() {
-  const client = createPublicClient();
-  const empty = {
-    categories: [] as Term[],
-    modalities: [] as Term[],
-    specialties: [] as Term[],
-    sessionTypes: [] as Term[],
-    amenities: [] as Term[],
-  };
-  if (!client) return empty;
-  const [categories, modalities, specialties, sessionTypes, amenities] = await Promise.all([
-    client.from("categories").select("id, slug, name").order("sort_order"),
-    client.from("modalities").select("id, slug, name").order("sort_order"),
-    client.from("specialties").select("id, slug, name").order("sort_order"),
-    client.from("session_types").select("id, slug, name").order("sort_order"),
-    client.from("amenities").select("id, slug, name").order("sort_order"),
-  ]);
-  return {
-    categories: (categories.data ?? []) as Term[],
-    modalities: (modalities.data ?? []) as Term[],
-    specialties: (specialties.data ?? []) as Term[],
-    sessionTypes: (sessionTypes.data ?? []) as Term[],
-    amenities: (amenities.data ?? []) as Term[],
-  };
+export type Taxonomy = {
+  categories: Term[];
+  modalities: Term[];
+  specialties: Term[];
+  sessionTypes: Term[];
+  amenities: Term[];
+};
+
+const EMPTY_TAXONOMY: Taxonomy = {
+  categories: [],
+  modalities: [],
+  specialties: [],
+  sessionTypes: [],
+  amenities: [],
+};
+
+// Lookup tables are seed/admin data with no in-app mutation path, so they are
+// shared across requests via unstable_cache (matches the pages' revalidate=3600).
+const fetchTaxonomy = unstable_cache(
+  async (): Promise<Taxonomy> => {
+    const client = createPublicClient();
+    if (!client) return EMPTY_TAXONOMY;
+    const [categories, modalities, specialties, sessionTypes, amenities] = await Promise.all([
+      client.from("categories").select("id, slug, name").order("sort_order"),
+      client.from("modalities").select("id, slug, name").order("sort_order"),
+      client.from("specialties").select("id, slug, name").order("sort_order"),
+      client.from("session_types").select("id, slug, name").order("sort_order"),
+      client.from("amenities").select("id, slug, name").order("sort_order"),
+    ]);
+    return {
+      categories: (categories.data ?? []) as Term[],
+      modalities: (modalities.data ?? []) as Term[],
+      specialties: (specialties.data ?? []) as Term[],
+      sessionTypes: (sessionTypes.data ?? []) as Term[],
+      amenities: (amenities.data ?? []) as Term[],
+    };
+  },
+  ["taxonomy"],
+  { revalidate: 3600, tags: ["taxonomy"] },
+);
+
+export async function getTaxonomy(): Promise<Taxonomy> {
+  if (!isSupabaseConfigured) return EMPTY_TAXONOMY;
+  return fetchTaxonomy();
 }
-export type Taxonomy = Awaited<ReturnType<typeof getTaxonomy>>;
+
+const fetchCities = unstable_cache(
+  async (publishedOnly: boolean): Promise<City[]> => {
+    const client = createPublicClient();
+    if (!client) return [];
+    let query = client.from("cities").select(CITY_COLUMNS).order("name");
+    if (publishedOnly) query = query.eq("is_published", true);
+    const { data } = await query;
+    return data ?? [];
+  },
+  ["cities"],
+  { revalidate: 3600, tags: ["cities"] },
+);
 
 export async function getCities({ publishedOnly = false } = {}): Promise<City[]> {
-  const client = createPublicClient();
-  if (!client) return [];
-  let query = client.from("cities").select(CITY_COLUMNS).order("name");
-  if (publishedOnly) query = query.eq("is_published", true);
-  const { data } = await query;
-  return data ?? [];
+  if (!isSupabaseConfigured) return [];
+  return fetchCities(publishedOnly);
 }
 
+const fetchCityBySlug = unstable_cache(
+  async (slug: string): Promise<City | null> => {
+    const client = createPublicClient();
+    if (!client) return null;
+    const { data } = await client
+      .from("cities")
+      .select(CITY_COLUMNS)
+      .eq("slug", slug)
+      .maybeSingle();
+    return data;
+  },
+  ["city-by-slug"],
+  { revalidate: 3600, tags: ["cities"] },
+);
+
 export const getCityBySlug = cache(async (slug: string): Promise<City | null> => {
-  const client = createPublicClient();
-  if (!client) return null;
-  const { data } = await client.from("cities").select(CITY_COLUMNS).eq("slug", slug).maybeSingle();
-  return data;
+  if (!isSupabaseConfigured) return null;
+  return fetchCityBySlug(slug);
 });
 
 export async function getTrainersByCity(cityId: number, limit = 100) {
