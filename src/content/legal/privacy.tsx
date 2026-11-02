@@ -4,8 +4,10 @@ import type { LegalDocument } from "@/lib/legal/types";
 export const privacyDoc: LegalDocument = {
   intro: (
     <p>
-      [Opening paragraph: what FitnessMode is, who operates it ({legalConfig.operatorName}), and
-      that this policy explains what data is collected and why.]
+      FitnessMode is a free online directory where fitness trainers publish a public profile and
+      visitors can browse and contact them directly. It is operated by {legalConfig.operatorName}.
+      This policy explains what personal data we collect when you use the site, why we collect it,
+      and the choices you have.
     </p>
   ),
   sections: [
@@ -14,8 +16,10 @@ export const privacyDoc: LegalDocument = {
       title: "Who we are",
       body: (
         <p>
-          [Identify the operator ({legalConfig.operatorName}) as the data controller, and how to
-          reach them ({legalConfig.contactEmail}).]
+          {legalConfig.operatorName} is the data controller for the personal data described in this
+          policy (the &quot;responsable del tratamiento&quot; under Colombian law). You can reach us
+          at <a href={`mailto:${legalConfig.contactEmail}`}>{legalConfig.contactEmail}</a> for any
+          privacy question or request.
         </p>
       ),
     },
@@ -24,28 +28,31 @@ export const privacyDoc: LegalDocument = {
       title: "Data we collect",
       body: (
         <>
-          <p>[Describe each category. The app actually collects:]</p>
+          <p>We collect the following categories of data:</p>
           <ul>
             <li>
-              [Account data — trainer email address for sign-in (magic link or Google OAuth).]
+              <strong>Account data.</strong> When a trainer creates an account we store their email
+              address to sign them in (via email magic link or Google OAuth).
             </li>
             <li>
-              [Profile content — display name, headline, bio, city or custom location, rates,
-              categories/modalities/specialties, languages, education, avatar and gallery photos,
-              Instagram/TikTok/website links.]
+              <strong>Profile content.</strong> The information trainers publish on their profile:
+              display name, headline, bio, city or custom location, rates, categories, modalities
+              and specialties, languages, education, avatar and gallery photos, and links to
+              Instagram, TikTok or a personal website.
             </li>
             <li>
-              [Contact channels — WhatsApp and phone numbers are stored for all profiles but
-              displayed publicly only on paid (Pro) profiles.]
+              <strong>Contact channels.</strong> WhatsApp and phone numbers are stored for all
+              profiles but displayed publicly only on paid (Pro) profiles.
             </li>
             <li>
-              [Usage analytics — first-party view/click events on trainer profiles (event type,
-              click target, referring host, timestamp). No IP addresses, no third-party trackers, no
-              analytics cookies.]
+              <strong>Usage analytics.</strong> We record first-party view and click events on
+              trainer profiles (event type, click target, referring host and timestamp) to power
+              each trainer&apos;s stats dashboard. These events contain no IP addresses, no
+              third-party trackers and no analytics cookies.
             </li>
             <li>
-              [On-device data — the favorites list is stored in the visitor&apos;s browser
-              localStorage and never reaches our servers.]
+              <strong>On-device data.</strong> The favorites list is stored in the visitor&apos;s
+              browser localStorage and never reaches our servers.
             </li>
           </ul>
         </>
@@ -56,8 +63,9 @@ export const privacyDoc: LegalDocument = {
       title: "How we use data",
       body: (
         <p>
-          [Purposes: run the directory, display trainer profiles, authenticate accounts, produce the
-          per-trainer stats dashboard, prevent abuse, and operate/improve the service.]
+          We use the data above to operate the directory, display trainer profiles publicly,
+          authenticate trainer accounts, produce each trainer&apos;s stats dashboard, prevent abuse
+          and spam, and operate, maintain and improve the service.
         </p>
       ),
     },
@@ -66,8 +74,11 @@ export const privacyDoc: LegalDocument = {
       title: "Legal bases",
       body: (
         <p>
-          [If you serve EU/EEA visitors: contract performance, legitimate interest, and consent
-          where applicable.]
+          Where the law requires a legal basis (for example under the GDPR for EU/EEA visitors or
+          Ley 1581 de 2012 in Colombia), we process data on the grounds of: performing the contract
+          with trainers who create a profile; our legitimate interest in running, securing and
+          improving the directory; and consent where applicable, which you may withdraw at any
+          time.
         </p>
       ),
     },
@@ -76,15 +87,17 @@ export const privacyDoc: LegalDocument = {
       title: "Sharing and processors",
       body: (
         <>
-          <p>[List the services that process data on your behalf:]</p>
+          <p>We share data only with the services that process it on our behalf:</p>
           <ul>
-            <li>[Supabase — database, authentication, image storage]</li>
-            <li>[Hosting provider (e.g. Vercel) — serves the site]</li>
-            <li>[Google — optional OAuth sign-in]</li>
-            <li>[Mapbox — optional city search geocoding (receives search text)]</li>
-            <li>[Email delivery provider — sends magic links]</li>
+            <li>Supabase — database, authentication and image storage</li>
+            <li>Our hosting provider — serves the site and processes requests</li>
+            <li>Google — optional OAuth sign-in for trainers</li>
+            <li>Mapbox — optional city search geocoding, which receives the search text you type</li>
+            <li>Email delivery provider — sends sign-in magic links</li>
           </ul>
-          <p>[State that you do not sell personal data.]</p>
+          <p>
+            We do not sell personal data, and we do not share it with advertisers or data brokers.
+          </p>
         </>
       ),
     },
@@ -93,8 +106,10 @@ export const privacyDoc: LegalDocument = {
       title: "International transfers",
       body: (
         <p>
-          [Where data may be processed outside the visitor&apos;s country and which safeguards
-          apply.]
+          Some of the providers above process data in countries other than your own, including the
+          United States. Where required, these transfers rely on the safeguards offered by those
+          providers (such as standard contractual clauses or equivalent mechanisms under their
+          privacy programs).
         </p>
       ),
     },
@@ -103,8 +118,11 @@ export const privacyDoc: LegalDocument = {
       title: "Retention",
       body: (
         <p>
-          [How long account, profile and analytics data is kept, including what happens after
-          profile deletion (profile and photos are deleted; the sign-in account may be retained).]
+          We keep account, profile and analytics data for as long as the profile or account is
+          active and as needed for the purposes described above. When a trainer deletes their
+          profile, the profile and its photos are removed; the underlying sign-in account may be
+          retained for security, fraud-prevention or legal reasons. Aggregated statistics that can
+          no longer identify a person may be kept indefinitely.
         </p>
       ),
     },
@@ -113,38 +131,55 @@ export const privacyDoc: LegalDocument = {
       title: "Your rights",
       body: (
         <p>
-          [Access, correction, deletion, portability, objection — note that trainers can edit or
-          delete their profile from the dashboard, and other requests go to{" "}
-          {legalConfig.contactEmail}.]
+          Depending on where you live, you may have rights to access, correct, delete or port your
+          personal data, to object to or restrict processing, and to withdraw consent. In Colombia
+          these include the rights of consultation, update, rectification, deletion and revocation
+          under Ley 1581 de 2012. Trainers can edit or delete their profile directly from the
+          dashboard; for anything else, email us at{" "}
+          <a href={`mailto:${legalConfig.contactEmail}`}>{legalConfig.contactEmail}</a>.
         </p>
       ),
     },
     {
       id: "children",
       title: "Children",
-      body: <p>[The service is not directed at children; state the minimum age.]</p>,
+      body: (
+        <p>
+          The service is not directed at children. You must be at least 18 years old to create an
+          account, and we do not knowingly collect personal data from children. If you believe a
+          child has provided us personal data, contact us and we will delete it.
+        </p>
+      ),
     },
     {
       id: "security",
       title: "Security",
       body: (
         <p>
-          [Brief statement on measures (encryption in transit, access controls) and that no system
-          is perfectly secure.]
+          We use reasonable technical and organizational measures to protect personal data,
+          including encryption in transit and restricted access to our systems. That said, no
+          method of transmission or storage is completely secure, and we cannot guarantee absolute
+          security.
         </p>
       ),
     },
     {
       id: "changes",
       title: "Changes to this policy",
-      body: <p>[How updates are posted and when they take effect.]</p>,
+      body: (
+        <p>
+          We may update this policy from time to time. Changes are posted on this page and take
+          effect when published; the &quot;last updated&quot; date above shows the current version.
+        </p>
+      ),
     },
     {
       id: "contact",
       title: "Contact",
       body: (
         <p>
-          [{legalConfig.operatorName} — {legalConfig.contactEmail}]
+          {legalConfig.operatorName} —{" "}
+          <a href={`mailto:${legalConfig.contactEmail}`}>{legalConfig.contactEmail}</a>
         </p>
       ),
     },

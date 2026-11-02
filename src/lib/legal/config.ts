@@ -1,9 +1,10 @@
-// Replace every bracketed value with the real one before launch. These are
-// referenced by the legal documents in src/content/legal so real values only
-// need to be swapped in here once.
+// Operator details referenced by the legal documents in src/content/legal.
+// Before launch, replace operatorName with your full legal name or registered
+// entity (e.g. "Jane Doe — FitnessMode"), since it should identify a real
+// legal person rather than only a trade name.
 export const legalConfig = {
-  operatorName: "[Operator legal name]",
-  contactEmail: "[privacy@yourdomain.com]",
-  governingLaw: "[State], United States",
-  effectiveDate: "[Effective date]",
+  operatorName: "FitnessMode",
+  contactEmail: "crontreras1dev@gmail.com",
+  governingLaw: "the Republic of Colombia",
+  effectiveDate: "November 1, 2026",
 } as const;

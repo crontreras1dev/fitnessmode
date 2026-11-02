@@ -4,8 +4,9 @@ import type { LegalDocument } from "@/lib/legal/types";
 export const cookiesDoc: LegalDocument = {
   intro: (
     <p>
-      [Opening paragraph: how FitnessMode uses cookies and similar storage. The site only uses
-      strictly-necessary cookies, so no consent banner is required.]
+      This notice explains how FitnessMode uses cookies and similar browser storage. We only use
+      strictly-necessary cookies — the site works without advertising or third-party analytics
+      cookies — so no consent banner is required.
     </p>
   ),
   sections: [
@@ -14,15 +15,16 @@ export const cookiesDoc: LegalDocument = {
       title: "Cookies we use",
       body: (
         <>
-          <p>[Describe each cookie. The app actually sets:]</p>
+          <p>The site sets only these cookies:</p>
           <ul>
             <li>
-              [Authentication session cookie (Supabase) — keeps signed-in trainers logged in.
-              Strictly necessary.]
+              <strong>Authentication session cookie.</strong> Set by Supabase when a trainer signs
+              in; it keeps the session active across pages. Strictly necessary — signing in does
+              not work without it.
             </li>
             <li>
-              [Locale cookie — remembers whether you browse in English or Spanish. Strictly
-              necessary.]
+              <strong>Locale cookie.</strong> Remembers whether you browse in English or Spanish so
+              we can show the site in your language. Strictly necessary for your preference.
             </li>
           </ul>
         </>
@@ -33,8 +35,9 @@ export const cookiesDoc: LegalDocument = {
       title: "Browser storage",
       body: (
         <p>
-          [The favorites list is stored in your browser&apos;s localStorage. It stays on your device
-          and is never sent to our servers.]
+          Your favorites list is stored in your browser&apos;s localStorage. It stays on your
+          device, is never sent to our servers, and you can clear it at any time through your
+          browser settings.
         </p>
       ),
     },
@@ -43,8 +46,9 @@ export const cookiesDoc: LegalDocument = {
       title: "No tracking cookies",
       body: (
         <p>
-          [We do not use advertising or third-party analytics cookies. Profile view/click statistics
-          are recorded first-party and contain no IP address.]
+          We do not use advertising cookies, social-media trackers or third-party analytics
+          cookies. The view and click statistics shown on trainer profiles are recorded
+          first-party and contain no IP address.
         </p>
       ),
     },
@@ -53,22 +57,29 @@ export const cookiesDoc: LegalDocument = {
       title: "Managing cookies",
       body: (
         <p>
-          [How to block or delete cookies in your browser, and that sign-in will stop working
-          without the session cookie.]
+          You can block or delete cookies through your browser&apos;s settings. Keep in mind that
+          blocking the session cookie will prevent trainers from signing in, and blocking the
+          locale cookie means the language preference won&apos;t be remembered.
         </p>
       ),
     },
     {
       id: "changes",
       title: "Changes to this notice",
-      body: <p>[How updates are posted and when they take effect.]</p>,
+      body: (
+        <p>
+          We may update this notice from time to time. Changes are posted on this page and take
+          effect when published; the &quot;last updated&quot; date above shows the current version.
+        </p>
+      ),
     },
     {
       id: "contact",
       title: "Contact",
       body: (
         <p>
-          [{legalConfig.operatorName} — {legalConfig.contactEmail}]
+          {legalConfig.operatorName} —{" "}
+          <a href={`mailto:${legalConfig.contactEmail}`}>{legalConfig.contactEmail}</a>
         </p>
       ),
     },
