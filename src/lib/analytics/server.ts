@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import type { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -19,7 +20,26 @@ function referrerHost(request: NextRequest) {
   }
 }
 
-/** Shared handler for /api/track/*: validates the payload and writes a profile_events row. */
+function clientIp(request: NextRequest) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+  return request.headers.get("x-real-ip");
+}
+
+/** Salted, per-profile IP hash: dedups repeat events without storing raw IPs or correlating a visitor across profiles. */
+function hashIp(ip: string, profileId: string) {
+  const salt = process.env.TRACK_IP_SALT ?? process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  return createHash("sha256").update(`${salt}:${profileId}:${ip}`).digest("hex");
+}
+
+/**
+ * Shared handler for /api/track/*: validates the payload and records a
+ * profile_events row, skipping repeats from the same IP within the dedup
+ * window enforced by record_profile_event().
+ */
 export async function handleTrackRequest<
   S extends z.ZodType<{ profileId: string; target?: ClickTarget }>,
 >(request: NextRequest, schema: S, eventType: EventType) {
@@ -49,11 +69,13 @@ export async function handleTrackRequest<
     return NextResponse.json({ error: "Unknown profile" }, { status: 404 });
   }
 
-  const { error } = await supabase.from("profile_events").insert({
-    profile_id: profileId,
-    event_type: eventType,
-    target: eventType === "click" ? target : null,
-    referrer: referrerHost(request),
+  const ip = clientIp(request);
+  const { error } = await supabase.rpc("record_profile_event", {
+    p_profile_id: profileId,
+    p_event_type: eventType,
+    p_target: eventType === "click" ? (target ?? null) : null,
+    p_referrer: referrerHost(request),
+    p_ip_hash: ip ? hashIp(ip, profileId) : null,
   });
   if (error) {
     return NextResponse.json({ error: "Could not record event" }, { status: 500 });

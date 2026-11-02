@@ -51,8 +51,10 @@ supabase/             config.toml, migrations/0001_init.sql, seed.sql, email tem
 - Slugs are generated and de-duplicated by a trigger (`ana-garcia`, `ana-garcia-2`, ...).
 - `whatsapp` / `phone` are not granted to `anon`; they are exposed only via
   `get_profile_contact()`, which returns them for active Pro profiles (or the owner).
-- `profile_events` is written only by the server (`/api/track/*`, service-role key); owners can
-  read their own events, aggregated by `get_profile_stats()` / `get_profile_click_breakdown()`.
+- `profile_events` is written only by the server (`/api/track/*`, service-role key) via
+  `record_profile_event()`, which skips repeat events from the same (salted) IP hash within
+  30 minutes. Owners can read their own events, aggregated as unique IPs by
+  `get_profile_stats()` / `get_profile_click_breakdown()`.
 
 ## Environment
 

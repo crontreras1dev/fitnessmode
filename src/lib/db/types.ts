@@ -188,6 +188,7 @@ export type Database = {
           created_at: string;
           event_type: Database["public"]["Enums"]["profile_event_type"];
           id: number;
+          ip_hash: string | null;
           profile_id: string;
           referrer: string | null;
           target: Database["public"]["Enums"]["profile_click_target"] | null;
@@ -196,6 +197,7 @@ export type Database = {
           created_at?: string;
           event_type: Database["public"]["Enums"]["profile_event_type"];
           id?: never;
+          ip_hash?: string | null;
           profile_id: string;
           referrer?: string | null;
           target?: Database["public"]["Enums"]["profile_click_target"] | null;
@@ -204,6 +206,7 @@ export type Database = {
           created_at?: string;
           event_type?: Database["public"]["Enums"]["profile_event_type"];
           id?: never;
+          ip_hash?: string | null;
           profile_id?: string;
           referrer?: string | null;
           target?: Database["public"]["Enums"]["profile_click_target"] | null;
@@ -494,6 +497,17 @@ export type Database = {
           day: string;
           views: number;
         }[];
+      };
+      record_profile_event: {
+        Args: {
+          p_profile_id: string;
+          p_event_type: Database["public"]["Enums"]["profile_event_type"];
+          p_target?: Database["public"]["Enums"]["profile_click_target"] | null;
+          p_referrer?: string | null;
+          p_ip_hash?: string | null;
+          p_dedup_minutes?: number;
+        };
+        Returns: number | null;
       };
       search_profiles: {
         Args: {
