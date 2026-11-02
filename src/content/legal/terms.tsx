@@ -36,9 +36,9 @@ export const termsDoc: LegalDocument = {
       title: "Accounts",
       body: (
         <p>
-          Trainers sign in with an email magic link or their Google account. You are responsible
-          for everything that happens under your account and for keeping your profile accurate and
-          up to date.
+          Trainers sign in with an email magic link or their Google account. You are responsible for
+          everything that happens under your account and for keeping your profile accurate and up to
+          date.
         </p>
       ),
     },
@@ -58,8 +58,8 @@ export const termsDoc: LegalDocument = {
       title: "Content you submit",
       body: (
         <p>
-          You keep ownership of the photos, bio, links and other content you submit. By posting
-          them you grant us a non-exclusive, worldwide, royalty-free license to host, display and
+          You keep ownership of the photos, bio, links and other content you submit. By posting them
+          you grant us a non-exclusive, worldwide, royalty-free license to host, display and
           distribute them as part of the directory. You confirm that you have the right to post the
           content and that it does not infringe anyone else&apos;s rights.
         </p>
@@ -70,9 +70,9 @@ export const termsDoc: LegalDocument = {
       title: "Prohibited content",
       body: (
         <p>
-          You may not post unlawful, misleading, infringing or harmful content; create fake,
-          scraped or duplicate listings; harass other users; scrape the directory; or misuse or
-          interfere with the site&apos;s tracking and analytics endpoints.
+          You may not post unlawful, misleading, infringing or harmful content; create fake, scraped
+          or duplicate listings; harass other users; scrape the directory; or misuse or interfere
+          with the site&apos;s tracking and analytics endpoints.
         </p>
       ),
     },
@@ -92,9 +92,9 @@ export const termsDoc: LegalDocument = {
       title: "Dealings between users",
       body: (
         <p>
-          Sessions, payments and communications are strictly between the client and the trainer.
-          We take no commission and are not responsible for the quality, safety, legality or
-          outcome of any service arranged through the directory.
+          Sessions, payments and communications are strictly between the client and the trainer. We
+          take no commission and are not responsible for the quality, safety, legality or outcome of
+          any service arranged through the directory.
         </p>
       ),
     },
@@ -103,8 +103,8 @@ export const termsDoc: LegalDocument = {
       title: "Free and paid features",
       body: (
         <p>
-          Publishing a profile and browsing the directory are free. Optional paid features — such
-          as displaying WhatsApp or call buttons, featured placement or a verified badge — may be
+          Publishing a profile and browsing the directory are free. Optional paid features — such as
+          displaying WhatsApp or call buttons, featured placement or a verified badge — may be
           offered under separate pricing and terms communicated at the time of purchase.
         </p>
       ),

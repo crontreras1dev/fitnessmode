@@ -77,8 +77,7 @@ export const privacyDoc: LegalDocument = {
           Where the law requires a legal basis (for example under the GDPR for EU/EEA visitors or
           Ley 1581 de 2012 in Colombia), we process data on the grounds of: performing the contract
           with trainers who create a profile; our legitimate interest in running, securing and
-          improving the directory; and consent where applicable, which you may withdraw at any
-          time.
+          improving the directory; and consent where applicable, which you may withdraw at any time.
         </p>
       ),
     },
@@ -92,7 +91,9 @@ export const privacyDoc: LegalDocument = {
             <li>Supabase — database, authentication and image storage</li>
             <li>Our hosting provider — serves the site and processes requests</li>
             <li>Google — optional OAuth sign-in for trainers</li>
-            <li>Mapbox — optional city search geocoding, which receives the search text you type</li>
+            <li>
+              Mapbox — optional city search geocoding, which receives the search text you type
+            </li>
             <li>Email delivery provider — sends sign-in magic links</li>
           </ul>
           <p>
@@ -157,8 +158,8 @@ export const privacyDoc: LegalDocument = {
       body: (
         <p>
           We use reasonable technical and organizational measures to protect personal data,
-          including encryption in transit and restricted access to our systems. That said, no
-          method of transmission or storage is completely secure, and we cannot guarantee absolute
+          including encryption in transit and restricted access to our systems. That said, no method
+          of transmission or storage is completely secure, and we cannot guarantee absolute
           security.
         </p>
       ),

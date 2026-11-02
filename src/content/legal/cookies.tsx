@@ -19,8 +19,8 @@ export const cookiesDoc: LegalDocument = {
           <ul>
             <li>
               <strong>Authentication session cookie.</strong> Set by Supabase when a trainer signs
-              in; it keeps the session active across pages. Strictly necessary — signing in does
-              not work without it.
+              in; it keeps the session active across pages. Strictly necessary — signing in does not
+              work without it.
             </li>
             <li>
               <strong>Locale cookie.</strong> Remembers whether you browse in English or Spanish so
@@ -46,9 +46,9 @@ export const cookiesDoc: LegalDocument = {
       title: "No tracking cookies",
       body: (
         <p>
-          We do not use advertising cookies, social-media trackers or third-party analytics
-          cookies. The view and click statistics shown on trainer profiles are recorded
-          first-party and contain no IP address.
+          We do not use advertising cookies, social-media trackers or third-party analytics cookies.
+          The view and click statistics shown on trainer profiles are recorded first-party and
+          contain no IP address.
         </p>
       ),
     },
@@ -58,8 +58,8 @@ export const cookiesDoc: LegalDocument = {
       body: (
         <p>
           You can block or delete cookies through your browser&apos;s settings. Keep in mind that
-          blocking the session cookie will prevent trainers from signing in, and blocking the
-          locale cookie means the language preference won&apos;t be remembered.
+          blocking the session cookie will prevent trainers from signing in, and blocking the locale
+          cookie means the language preference won&apos;t be remembered.
         </p>
       ),
     },
