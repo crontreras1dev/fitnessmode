@@ -465,5 +465,11 @@
     "title": "Page not found",
     "body": "The page you're looking for doesn't exist or has moved.",
     "backHome": "Back to home"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "We hit an unexpected error. You can try again or head back home.",
+    "tryAgain": "Try again",
+    "backHome": "Back to home"
   }
 }

@@ -446,5 +446,11 @@
     "title": "Página no encontrada",
     "body": "La página que buscas no existe o se ha movido.",
     "backHome": "Volver al inicio"
+  },
+  "errorPage": {
+    "title": "Algo salió mal",
+    "body": "Ocurrió un error inesperado. Puedes intentarlo de nuevo o volver al inicio.",
+    "tryAgain": "Intentar de nuevo",
+    "backHome": "Volver al inicio"
   }
 }
