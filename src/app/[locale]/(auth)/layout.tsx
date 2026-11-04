@@ -1,6 +1,15 @@
+import { setRequestLocale } from "next-intl/server";
 import { SiteHeader } from "@/components/ui/site-header";
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <>
       <SiteHeader />
