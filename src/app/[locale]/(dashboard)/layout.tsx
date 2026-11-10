@@ -30,20 +30,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <>
       <header className="border-border bg-surface border-b">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex max-w-5xl flex-col items-start gap-2 px-4 py-3 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-0">
           <Link href="/" className="flex shrink-0 items-center">
             <Image
               src="/images/logo.png"
               alt="FitnessMode"
               width={2172}
               height={724}
-              className="h-9 w-auto"
+              className="h-8 w-auto sm:h-9"
               priority
             />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center justify-between gap-3 sm:w-auto">
             <form action={signOutAction} method="post">
-              <button type="submit" className="text-text-muted hover:text-text text-sm">
+              <button
+                type="submit"
+                className="text-text-muted hover:text-text min-h-11 text-sm whitespace-nowrap"
+              >
                 {th("signOut")}
               </button>
             </form>

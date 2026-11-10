@@ -8,7 +8,7 @@ export function SiteFooter() {
     <footer className="border-border mt-auto border-t">
       <div className="text-text-muted mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>{t("tagline", { year: new Date().getFullYear(), site: siteConfig.name })}</p>
-        <nav className="flex gap-4">
+        <nav className="flex flex-wrap gap-x-4 gap-y-2">
           <Link href="/search" className="hover:text-text">
             {t("findTrainer")}
           </Link>

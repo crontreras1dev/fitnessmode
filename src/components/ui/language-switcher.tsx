@@ -27,7 +27,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
       role="group"
       aria-label={t("switchLanguage")}
       className={cn(
-        "border-border bg-surface inline-flex items-center rounded-full border p-0.5 text-xs font-medium",
+        "border-border bg-surface inline-flex shrink-0 items-center rounded-full border p-0.5 text-xs font-medium",
         className,
       )}
     >

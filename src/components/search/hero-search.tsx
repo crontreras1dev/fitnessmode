@@ -42,7 +42,7 @@ export function HeroSearch({ modalities }: { modalities: Term[] }) {
         value={city}
         onChange={setCity}
         placeholder={t("cityPlaceholder")}
-        className="flex-1"
+        className="min-w-0 flex-1"
         inputClassName="border-transparent sm:h-12"
       />
       <label htmlFor="hero-modality" className="sr-only">

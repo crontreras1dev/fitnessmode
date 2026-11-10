@@ -67,7 +67,7 @@ export function SiteHeader() {
             alt="FitnessMode"
             width={2172}
             height={724}
-            className="h-9 w-auto"
+            className="h-8 w-auto sm:h-9"
             priority
           />
         </Link>
@@ -116,7 +116,7 @@ export function SiteHeader() {
         <div className="-mr-2 flex items-center gap-1 sm:hidden">
           <button
             type="button"
-            className="text-text hover:bg-surface-muted rounded-lg p-2"
+            className="text-text hover:bg-surface-muted flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2"
             aria-label={t("header.toggleMenu")}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
