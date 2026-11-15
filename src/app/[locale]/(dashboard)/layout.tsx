@@ -1,9 +1,8 @@
-import Image from "next/image";
-import { getLocale, getTranslations } from "next-intl/server";
-import { getPathname, Link, redirect } from "@/i18n/navigation";
+import { getLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { createClient } from "@/lib/supabase/server";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SiteFooter } from "@/components/ui/site-footer";
 
 export const dynamic = "force-dynamic";
@@ -15,56 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   } = await supabase.auth.getUser();
   if (!user) redirect({ href: "/login?next=/dashboard", locale: (await getLocale()) as Locale });
 
-  const [t, th, locale] = await Promise.all([
-    getTranslations("dashboard"),
-    getTranslations("header"),
-    getLocale(),
-  ]);
-  const signOutAction = getPathname({ href: "/auth/signout", locale: locale as Locale });
-  const nav = [
-    { href: "/dashboard", label: t("overview") },
-    { href: "/dashboard/profile", label: t("profile") },
-    { href: "/dashboard/stats", label: t("stats") },
-  ];
-
   return (
     <>
-      <header className="border-border bg-surface border-b">
-        <div className="mx-auto flex max-w-5xl flex-col items-start gap-2 px-4 py-3 sm:h-16 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-0">
-          <Link href="/" className="flex shrink-0 items-center">
-            <Image
-              src="/images/logo.png"
-              alt="FitnessMode"
-              width={2172}
-              height={724}
-              className="h-8 w-auto sm:h-9"
-              priority
-            />
-          </Link>
-          <div className="flex w-full items-center justify-between gap-3 sm:w-auto">
-            <form action={signOutAction} method="post">
-              <button
-                type="submit"
-                className="text-text-muted hover:text-text min-h-11 text-sm whitespace-nowrap"
-              >
-                {th("signOut")}
-              </button>
-            </form>
-            <LanguageSwitcher />
-          </div>
-        </div>
-        <nav className="mx-auto flex max-w-5xl gap-1 px-2 sm:px-4" aria-label={t("navAria")}>
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-text-muted hover:text-text rounded-t-lg px-3 py-2 text-sm"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </header>
+      <DashboardHeader />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6">{children}</main>
       <SiteFooter />
     </>
