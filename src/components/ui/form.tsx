@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "./cn";
 
 const controlClasses =
@@ -54,9 +55,10 @@ export function Field({
 
 export function ChoiceChip({
   label,
+  icon: Icon,
   className,
   ...props
-}: ComponentProps<"input"> & { label: string }) {
+}: ComponentProps<"input"> & { label: string; icon?: LucideIcon }) {
   return (
     <label
       className={cn(
@@ -65,6 +67,7 @@ export function ChoiceChip({
       )}
     >
       <input type="checkbox" className="sr-only" {...props} />
+      {Icon ? <Icon className="size-4" aria-hidden /> : null}
       {label}
     </label>
   );

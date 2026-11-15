@@ -12,6 +12,7 @@ import {
 } from "@/lib/validation/profile";
 import { CityAutocomplete, type CitySuggestion } from "@/components/search/city-autocomplete";
 import { ChoiceChip, Field, FieldError, Input, Select, Textarea } from "@/components/ui/form";
+import { termIcon } from "@/components/ui/term-icon";
 
 export type ProfileForm = UseFormReturn<ProfileFormInput, unknown, ProfileFormValues>;
 
@@ -142,6 +143,7 @@ function ChoiceGroup({
           <ChoiceChip
             key={option.id}
             label={termName(messages, kind, option)}
+            icon={termIcon(kind, option.slug)}
             value={String(option.id)}
             {...form.register(name)}
           />

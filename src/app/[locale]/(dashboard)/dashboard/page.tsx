@@ -1,3 +1,4 @@
+import { Ban, CircleCheck, Clock, Crown, User } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -46,11 +47,22 @@ export default async function DashboardPage({ params, searchParams }: Props) {
                   ? "danger"
                   : "amber"
             }
+            icon={
+              profile.status === "active"
+                ? CircleCheck
+                : profile.status === "suspended"
+                  ? Ban
+                  : Clock
+            }
             className="capitalize"
           >
             {t(`status.${profile.status}`)}
           </Badge>
-          <Badge tone={profile.tier === "pro" ? "pro" : "neutral"} className="uppercase">
+          <Badge
+            tone={profile.tier === "pro" ? "pro" : "neutral"}
+            icon={profile.tier === "pro" ? Crown : User}
+            className="uppercase"
+          >
             {t(`tier.${profile.tier}`)}
           </Badge>
         </div>

@@ -1,9 +1,10 @@
+import { BadgeCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { getPathname, Link, permanentRedirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { termName } from "@/i18n/terms";
+import { termName, type TaxonomyKind } from "@/i18n/terms";
 import {
   getSuggestedTrainers,
   getTrainerBySlug,
@@ -20,6 +21,7 @@ import {
   trainerProfilePath,
 } from "@/lib/seo/site";
 import { Badge } from "@/components/ui/badge";
+import { termIcon } from "@/components/ui/term-icon";
 import { Card } from "@/components/ui/card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { FavoriteButton } from "@/components/trainers/favorite-button";
@@ -99,18 +101,25 @@ function BadgeSection({
   title,
   terms,
   tone = "neutral",
+  kind,
 }: {
   title: string;
   terms: { slug: string; name: string }[];
   tone?: "neutral" | "brand";
+  kind?: TaxonomyKind;
 }) {
   if (!terms.length) return null;
   return (
     <section>
       <h2 className="text-lg font-semibold">{title}</h2>
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-3 flex flex-wrap gap-2">
         {terms.map((term) => (
-          <Badge key={term.slug} tone={tone}>
+          <Badge
+            key={term.slug}
+            tone={tone}
+            size="lg"
+            icon={kind ? termIcon(kind, term.slug) : undefined}
+          >
             {term.name}
           </Badge>
         ))}
@@ -197,7 +206,11 @@ export default async function TrainerProfilePage({ params }: Props) {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl font-semibold tracking-tight">{trainer.displayName}</h1>
-                {trainer.tier === "pro" ? <Badge tone="pro">{t("verified")}</Badge> : null}
+                {trainer.tier === "pro" ? (
+                  <Badge tone="pro" icon={BadgeCheck}>
+                    {t("verified")}
+                  </Badge>
+                ) : null}
               </div>
               <p className="text-text-muted mt-1">
                 {trainer.categories.length
@@ -274,6 +287,7 @@ export default async function TrainerProfilePage({ params }: Props) {
               name: name("modalities", term),
             }))}
             tone="brand"
+            kind="modalities"
           />
           <BadgeSection
             title={t("sessionFormat")}
@@ -282,6 +296,7 @@ export default async function TrainerProfilePage({ params }: Props) {
               name: name("sessionTypes", term),
             }))}
             tone="brand"
+            kind="sessionTypes"
           />
           <BadgeSection
             title={t("specialties")}
@@ -289,6 +304,7 @@ export default async function TrainerProfilePage({ params }: Props) {
               slug: term.slug,
               name: name("specialties", term),
             }))}
+            kind="specialties"
           />
           <BadgeSection
             title={t("languages")}
@@ -300,6 +316,7 @@ export default async function TrainerProfilePage({ params }: Props) {
               slug: term.slug,
               name: name("amenities", term),
             }))}
+            kind="amenities"
           />
         </div>
       </div>

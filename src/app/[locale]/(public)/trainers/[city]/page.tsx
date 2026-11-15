@@ -8,6 +8,7 @@ import { getCities, getCityBySlug, getTaxonomy, getTrainersByCity } from "@/lib/
 import { breadcrumbJsonLd, trainerItemListJsonLd } from "@/lib/seo/jsonld";
 import { cityPath } from "@/lib/seo/site";
 import { ButtonLink } from "@/components/ui/button";
+import { termIcon } from "@/components/ui/term-icon";
 import { JsonLd } from "@/components/seo/json-ld";
 import { TrainerGrid } from "@/components/trainers/trainer-card";
 
@@ -80,16 +81,20 @@ export default async function CityPage({ params }: Props) {
             : t("subtitleEmpty", { city: city.name })}
         </p>
         <ul className="mt-2 flex flex-wrap gap-2" aria-label={t("filterByModality")}>
-          {taxonomy.modalities.map((modality) => (
-            <li key={modality.slug}>
-              <Link
-                href={`/search?city=${city.slug}&modality=${modality.slug}`}
-                className="border-border bg-surface hover:border-brand inline-flex rounded-full border px-3.5 py-1.5 text-sm"
-              >
-                {termName(messages, "modalities", modality)}
-              </Link>
-            </li>
-          ))}
+          {taxonomy.modalities.map((modality) => {
+            const Icon = termIcon("modalities", modality.slug);
+            return (
+              <li key={modality.slug}>
+                <Link
+                  href={`/search?city=${city.slug}&modality=${modality.slug}`}
+                  className="border-border bg-surface hover:border-brand inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm"
+                >
+                  <Icon className="size-4" aria-hidden />
+                  {termName(messages, "modalities", modality)}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </header>
 

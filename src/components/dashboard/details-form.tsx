@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChoiceChip, Field, FieldError, Input } from "@/components/ui/form";
+import { termIcon } from "@/components/ui/term-icon";
 
 type DetailsForm = UseFormReturn<DetailsFormInput, unknown, DetailsFormValues>;
 
@@ -46,6 +47,7 @@ function ChipGroup({
           <ChoiceChip
             key={option.id}
             label={termName(messages, kind, option)}
+            icon={termIcon(kind, option.slug)}
             value={String(option.id)}
             {...form.register(name)}
           />
