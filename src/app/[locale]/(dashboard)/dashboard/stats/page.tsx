@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card } from "@/components/ui/card";
+import { DailyViewsChart } from "@/components/dashboard/daily-views-chart";
 import { getStats } from "../data";
 
 const TARGET_LABELS: Record<string, string> = {
@@ -24,7 +25,6 @@ export default async function DashboardStatsPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("stats");
   const stats = await getStats(30);
-  const peak = Math.max(1, ...stats.daily.map((row) => Number(row.views)));
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,16 +42,7 @@ export default async function DashboardStatsPage({ params }: Props) {
 
       <Card>
         <h2 className="font-semibold">{t("dailyViews")}</h2>
-        <div className="mt-4 flex h-40 items-end gap-1" role="img" aria-label={t("chartAria")}>
-          {stats.daily.map((row) => (
-            <div
-              key={row.day}
-              title={t("dayTooltip", { day: row.day, views: row.views, clicks: row.clicks })}
-              className="bg-brand/80 flex-1 rounded-t"
-              style={{ height: `${Math.max(2, (Number(row.views) / peak) * 100)}%` }}
-            />
-          ))}
-        </div>
+        <DailyViewsChart daily={stats.daily} />
       </Card>
 
       <Card>
@@ -76,28 +67,6 @@ export default async function DashboardStatsPage({ params }: Props) {
         ) : (
           <p className="text-text-muted mt-3 text-sm">{t("noClicks")}</p>
         )}
-      </Card>
-
-      <Card>
-        <h2 className="font-semibold">{t("dailyBreakdown")}</h2>
-        <table className="mt-4 w-full text-sm">
-          <thead className="text-text-muted text-left">
-            <tr>
-              <th className="pb-2 font-normal">{t("day")}</th>
-              <th className="pb-2 text-right font-normal">{t("views")}</th>
-              <th className="pb-2 text-right font-normal">{t("clicks")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...stats.daily].reverse().map((row) => (
-              <tr key={row.day} className="border-border border-t">
-                <td className="py-2">{row.day}</td>
-                <td className="py-2 text-right">{row.views}</td>
-                <td className="py-2 text-right">{row.clicks}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </Card>
     </div>
   );

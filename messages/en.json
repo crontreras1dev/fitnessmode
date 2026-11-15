@@ -347,9 +347,8 @@
     "channel": "Channel",
     "clicks": "Clicks",
     "noClicks": "No outbound clicks yet.",
-    "dailyBreakdown": "Daily breakdown",
-    "day": "Day",
-    "views": "Views"
+    "date": "Date",
+    "noViews": "No profile views in the last 30 days."
   },
   "cityAutocomplete": {
     "placeholder": "City",
