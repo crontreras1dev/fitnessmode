@@ -1,11 +1,13 @@
 import { Ban, CircleCheck, Clock, Crown, User } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
-import { trainerProfilePath } from "@/lib/seo/site";
+import { getPathname, Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { absoluteUrl, trainerProfilePath } from "@/lib/seo/site";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CopyProfileLink } from "@/components/dashboard/copy-profile-link";
 import { getStats, requireOwnProfile } from "./data";
 
 type Props = {
@@ -26,6 +28,9 @@ export default async function DashboardPage({ params, searchParams }: Props) {
   const { profile } = await requireOwnProfile();
   const stats = await getStats(30);
   const publicPath = trainerProfilePath(profile);
+  const publicUrl = absoluteUrl(
+    getPathname({ href: publicPath, locale: locale as Locale }),
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -95,6 +100,7 @@ export default async function DashboardPage({ params, searchParams }: Props) {
         <ButtonLink href="/dashboard/stats" variant="secondary">
           {t("viewStats")}
         </ButtonLink>
+        {profile.status === "active" ? <CopyProfileLink url={publicUrl} /> : null}
       </div>
     </div>
   );
