@@ -448,6 +448,25 @@
       "water-station": "Fuente de agua"
     }
   },
+  "legal": {
+    "contents": "En esta página",
+    "lastUpdated": "Última actualización: {date}",
+    "privacy": {
+      "title": "Política de privacidad",
+      "metaTitle": "Política de privacidad",
+      "metaDescription": "Cómo FitnessMode recopila, usa y protege tus datos."
+    },
+    "terms": {
+      "title": "Términos del servicio",
+      "metaTitle": "Términos del servicio",
+      "metaDescription": "Las reglas para usar FitnessMode y publicar un perfil de entrenador."
+    },
+    "cookies": {
+      "title": "Aviso de cookies",
+      "metaTitle": "Aviso de cookies",
+      "metaDescription": "Cómo FitnessMode usa cookies y el almacenamiento del navegador."
+    }
+  },
   "notFound": {
     "title": "Página no encontrada",
     "body": "La página que buscas no existe o se ha movido.",

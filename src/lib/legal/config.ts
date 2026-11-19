@@ -6,5 +6,8 @@ export const legalConfig = {
   operatorName: "FitnessMode",
   contactEmail: "crontreras1dev@gmail.com",
   governingLaw: "the Republic of Colombia",
-  effectiveDate: "November 1, 2026",
+  effectiveDate: {
+    en: "November 1, 2026",
+    es: "1 de noviembre de 2026",
+  },
 } as const;
